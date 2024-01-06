@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:panorama_viewer/panorama_viewer.dart';
+import 'package:panorama_viewer_app/panorama/panorama_viewer.dart';
+//import 'package:panorama_viewer/panorama_viewer.dart';
 
 class PanoramaView extends ConsumerStatefulWidget {
   final String? photo;
@@ -42,7 +43,7 @@ class _PanoramaView extends ConsumerState<PanoramaView> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton.extended(
