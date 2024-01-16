@@ -147,7 +147,6 @@ class PanoramaState extends State<PanoramaViewer>
   double longitudeDelta = 0;
   double zoomDelta = 0;
   Offset _lastFocalPoint = const Offset(0, 0);
-  double? _lastZoom;
   double _currentZoom = 1.0;
   double _targetZoom = 1.0;
   final double _radius = 500;
@@ -170,7 +169,6 @@ class PanoramaState extends State<PanoramaViewer>
 
   void _handleMoveStart(PointerDownEvent details) {
     _lastFocalPoint = details.localPosition;
-    _lastZoom = null;
   }
 
   void _handleMoveUpdate(PointerMoveEvent details) {

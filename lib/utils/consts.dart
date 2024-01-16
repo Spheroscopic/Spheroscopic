@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 // files
-const List<String> photoExtensions = [
-  'jpg',
-];
+const List<String> photoExtensions = ['jpg', 'png', 'dng', 'tif'];
 
 class TColor {
   static const Color m3BaseColor = Color(0xff6750a4);
@@ -30,7 +28,7 @@ class TColor {
 
   // get theme colors
   static Color mainColor(bool isDarkMode) {
-    return isDarkMode ? const Color(0xFF1C1B1E) : const Color(0xFFFFFBFF);
+    return isDarkMode ? const Color(0xFFFFFBFF) : const Color(0xFF1C1B1E);
   }
 
   static Color secondColor(bool isDarkMode) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as Material;
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:panorama_viewer_app/panorama/panorama_viewer.dart';
 //import 'package:panorama_viewer/panorama_viewer.dart';
@@ -32,7 +33,7 @@ class _PanoramaView extends ConsumerState<PanoramaView> {
   @override
   Widget build(BuildContext context) {
     return Builder(
-      builder: (context) => Scaffold(
+      builder: (context) => Material.Scaffold(
         body: Stack(
           children: [
             Center(
@@ -46,11 +47,11 @@ class _PanoramaView extends ConsumerState<PanoramaView> {
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Align(
                 alignment: Alignment.bottomLeft,
-                child: FloatingActionButton.extended(
+                child: FilledButton(
                   onPressed: () {
                     Navigator.of(context, rootNavigator: true).pop();
                   },
-                  label: const Text('Back'),
+                  child: const Text('Back'),
                 ),
               ),
             ),
