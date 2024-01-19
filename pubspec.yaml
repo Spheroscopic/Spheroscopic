@@ -1,9 +1,9 @@
-name: panorama_viewer_app
+name: spheroscopic
 description: "A new Flutter project."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.1
+version: 1.1.2
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -46,28 +46,40 @@ dev_dependencies:
   build_runner: ^2.4.7
 
 flutter_launcher_icons:
-  image_path: "assets/img/icon.png"
+  image_path: "assets/img/Logo.ico"
   windows:
     generate: true
-    image_path: "assets/img/icon.png"
-    icon_size: 48 # min:48, max:256, default: 48
+    image_path: "assets/img/Logo.ico"
+    icon_size: 256 # min:48, max:256, default: 48
 
 msix_config:
-  display_name: panoramaViewer
+  display_name: Spheroscopic
   publisher_display_name: Artem Bagin
   publisher: CN=DDE4AEE6-9493-4839-AD4F-C696473218F4
-  identity_name: 63552ArtemBagin.panoramaViewer
+  identity_name: 63552ArtemBagin.Spheroscopic
   store: false
 
-  windows_build_args: --obfuscate
+
 
   languages: en-us
-  logo_path: "assets/img/icon.png"
+  logo_path: "assets/img/Logo.ico"
 
   context_menu:
-    dll_path: assets/PanoramaViewerContextMenu.dll
+    dll_path: assets/OpenWithSpheroscopic_CM.dll
     items:
       - type: .jpg
+        commands:
+          - id: YourAppMenuCommand
+            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+      - type: .png
+        commands:
+          - id: YourAppMenuCommand
+            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+      - type: .tif
+        commands:
+          - id: YourAppMenuCommand
+            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+      - type: .tiff
         commands:
           - id: YourAppMenuCommand
             clsid: 4F996161-1319-44B8-BC22-ED05C5081D87

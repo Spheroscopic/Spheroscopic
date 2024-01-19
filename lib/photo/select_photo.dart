@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:panorama_viewer_app/class/recentFiles.dart';
-import 'package:panorama_viewer_app/class/shared_preferences.dart';
-import 'package:panorama_viewer_app/modules/snackbar.dart';
-import 'package:panorama_viewer_app/panorama/panorama_view.dart';
-import 'package:panorama_viewer_app/riverpod/photoState.dart';
-import 'package:panorama_viewer_app/utils/consts.dart';
+import 'package:spheroscopic/class/recentFiles.dart';
+import 'package:spheroscopic/class/shared_preferences.dart';
+import 'package:spheroscopic/modules/snackbar.dart';
+import 'package:spheroscopic/panorama/panorama_view.dart';
+import 'package:spheroscopic/riverpod/photoState.dart';
+import 'package:spheroscopic/utils/consts.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class PanoramaHandler {

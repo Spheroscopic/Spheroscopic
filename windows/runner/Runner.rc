@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "panorama_viewer" "\0"
+            VALUE "CompanyName", "ArtemBagin.Spheroscopic" "\0"
+            VALUE "FileDescription", "Spheroscopic" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "panorama_viewer" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "panorama_viewer.exe" "\0"
-            VALUE "ProductName", "panorama_viewer" "\0"
+            VALUE "InternalName", "Spheroscopic" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 ArtemBagin.Spheroscopic. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Spheroscopic.exe" "\0"
+            VALUE "ProductName", "Spheroscopic" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

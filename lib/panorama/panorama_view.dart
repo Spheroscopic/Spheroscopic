@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart' as Material;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:panorama_viewer_app/panorama/panorama_viewer.dart';
+import 'package:spheroscopic/panorama/panorama_viewer.dart';
 //import 'package:panorama_viewer/panorama_viewer.dart';
 
 class PanoramaView extends ConsumerStatefulWidget {

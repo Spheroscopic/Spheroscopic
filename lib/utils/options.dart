@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:panorama_viewer_app/class/recentFiles.dart';
+import 'package:spheroscopic/class/recentFiles.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
