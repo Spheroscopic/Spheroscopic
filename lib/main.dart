@@ -13,6 +13,7 @@ import 'package:spheroscopic/utils/options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:spheroscopic/utils/variables.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -114,13 +115,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late List<String> args;
-  late final AnimationController _animatedMapController;
+  //late final AnimationController _animatedController;
 
   @override
   void initState() {
     args = widget.args!;
 
-    _animatedMapController = AnimationController(
+    Variables.animatedController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     );
@@ -130,18 +131,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void dispose() {
-    _animatedMapController.dispose();
+    Variables.animatedController!.dispose();
     super.dispose();
   }
 
   bool _dragging = false;
-  bool recentlyOpened = false;
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<m.ScaffoldMessengerState> key =
-        GlobalKey<m.ScaffoldMessengerState>();
-
     final addPhotoButtonState = ref.watch(addPhotoState);
     bool isDarkMode =
         ref.watch(brightnessRef) == Brightness.dark ? true : false;
@@ -155,10 +152,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
     });
 
-    return Builder(
-      builder: (context) => m.Scaffold(
-        key: key,
-        body: DropTarget(
+    return m.Scaffold(
+      body: Builder(
+        builder: (context) => DropTarget(
           onDragDone: (detail) {
             setState(() {
               PanoramaHandler.openPanorama(detail.files[0].path, context);
@@ -166,10 +162,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           },
           onDragEntered: (detail) {
             setState(() {
-              _dragging = true;
+              Variables.animatedController!.reverse();
+              Variables.recentlyOpened = false;
 
-              recentlyOpened = false;
-              _animatedMapController.reverse();
+              _dragging = true;
             });
           },
           onDragExited: (detail) {
@@ -268,16 +264,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   Button(
                                     onPressed: () {
                                       setState(() {
-                                        if (recentlyOpened) {
-                                          recentlyOpened = false;
-                                          _animatedMapController.reverse();
+                                        if (Variables.recentlyOpened) {
+                                          Variables.animatedController!
+                                              .reverse();
+                                          Variables.recentlyOpened = false;
                                         } else {
-                                          _animatedMapController.forward();
-                                          recentlyOpened = true;
+                                          Variables.animatedController!
+                                              .forward();
+                                          Variables.recentlyOpened = true;
                                         }
                                       });
                                     },
-                                    child: const Text('Opened recently'),
+                                    child: const Text('Recently opened'),
                                   ),
                                 ],
                               ),
@@ -285,7 +283,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             Align(
                               alignment: Alignment.topRight,
                               child: Animate(
-                                controller: _animatedMapController,
+                                controller: Variables.animatedController!,
                                 autoPlay: false,
                                 effects: [
                                   FadeEffect(
@@ -298,7 +296,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     curve: Curves.easeOutQuad,
                                   )
                                 ],
-                                child: PanoPanel(),
+                                child: const PanoPanel(),
                               ),
                             ),
                           ],
