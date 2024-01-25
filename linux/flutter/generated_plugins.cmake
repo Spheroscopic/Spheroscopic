@@ -5,8 +5,10 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_drop
   flutter_acrylic
+  screen_retriever
   sentry_flutter
   system_theme
+  window_manager
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

@@ -18,10 +18,24 @@ import 'package:system_theme/system_theme.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main(List<String>? args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Window.initialize();
+
+  // Must add this line.
+  await windowManager.ensureInitialized();
+
+  // for setting minimal size of window
+  WindowOptions windowOptions = const WindowOptions(
+    minimumSize: Size(600, 400),
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   print('args: $args');
 

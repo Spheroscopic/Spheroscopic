@@ -33,6 +33,7 @@ dependencies:
   hive_generator: ^2.0.1
   shared_preferences: ^2.2.2
   transparent_image: ^2.0.1
+  window_manager: ^0.3.7
 
 
   
@@ -57,7 +58,7 @@ msix_config:
   publisher_display_name: Artem Bagin
   publisher: CN=DDE4AEE6-9493-4839-AD4F-C696473218F4
   identity_name: 63552ArtemBagin.Spheroscopic
-  store: false
+  store: true
 
 
 
