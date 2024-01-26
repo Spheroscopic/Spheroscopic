@@ -9,6 +9,8 @@ import 'package:spheroscopic/riverpod/photoState.dart';
 import 'package:spheroscopic/utils/consts.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:spheroscopic/utils/variables.dart';
+import 'package:path/path.dart' as path;
+import 'package:vr_player/vr_player.dart';
 
 class PanoramaHandler {
   // Open DialogBox for selecting photos
@@ -73,12 +75,24 @@ class PanoramaHandler {
       Variables.animatedController!.reverse();
       Variables.recentlyOpened = false;
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PanoramaView(panorama),
-        ),
-      );
+      String panExt = path.extension(panorama).trim().toLowerCase();
+
+      bool isPhotoExtension = photoExtensions.contains(panExt);
+
+      if (isPhotoExtension) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PanoramaView(panorama),
+          ),
+        );
+      } else {
+        openSnackBar(
+            title: 'Error:',
+            text:
+                'The selected file is not supported. Spheroscopic only supports: .jpg, .png, .dng, .tiff',
+            context: context);
+      }
     } on FileSystemException {
       openSnackBar(
           title: 'Error:',

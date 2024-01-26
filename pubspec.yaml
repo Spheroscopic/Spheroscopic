@@ -29,6 +29,7 @@ dependencies:
   shared_preferences: ^2.2.2
   transparent_image: ^2.0.1
   window_manager: ^0.3.7
+  vr_player: ^0.2.2
 
 
   

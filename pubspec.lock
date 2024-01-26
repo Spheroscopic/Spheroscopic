@@ -914,6 +914,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  vr_player:
+    dependency: "direct main"
+    description:
+      name: vr_player
+      sha256: "49590c7e9b3db64a66f95ec0e902a99a291712cca270f78c742f406c8dc091a3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   watcher:
     dependency: transitive
     description:
