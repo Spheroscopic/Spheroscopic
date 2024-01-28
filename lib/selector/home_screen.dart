@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart' as m;
+import 'package:spheroscopic/class/recentFiles.dart';
 import 'package:spheroscopic/panorama/recentlyPanorama.dart';
 import 'package:spheroscopic/photo/select_photo.dart';
 import 'package:spheroscopic/riverpod/photoState.dart';
@@ -54,7 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       print("HomeScreen build finished");
 
       if (args.isNotEmpty) {
-        PanoramaHandler.openPanorama(args[0], context);
+        PanoramaHandler.openPanorama(RecentFile(File(args[0])), context, ref);
         args = [];
       }
     });
@@ -64,7 +66,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         builder: (context) => DropTarget(
           onDragDone: (detail) {
             setState(() {
-              PanoramaHandler.openPanorama(detail.files[0].path, context);
+              PanoramaHandler.openPanorama(
+                  RecentFile(File(detail.files[0].path)), context, ref);
             });
           },
           onDragEntered: (detail) {

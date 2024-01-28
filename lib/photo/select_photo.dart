@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+//import 'package:spheroscopic/360video/360video_view.dart';
 import 'package:spheroscopic/class/recentFiles.dart';
 import 'package:spheroscopic/class/shared_preferences.dart';
 import 'package:spheroscopic/modules/snackbar.dart';
@@ -10,7 +11,6 @@ import 'package:spheroscopic/utils/consts.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:spheroscopic/utils/variables.dart';
 import 'package:path/path.dart' as path;
-import 'package:vr_player/vr_player.dart';
 
 class PanoramaHandler {
   // Open DialogBox for selecting photos
@@ -25,33 +25,7 @@ class PanoramaHandler {
 
     if (selectedFile != null) {
       try {
-        List<RecentFile> files =
-            ref.read(appProvider.notifier).getRecentFiles();
-
-        bool inList = false;
-
-        for (RecentFile file in files) {
-          if (file.file.path == selectedFile.files[0].path) {
-            inList = true;
-          }
-        }
-
-        if (!inList) {
-          if (files.length == 10) {
-            files.removeAt(0); // delete the old one
-          }
-
-          files.add(
-            RecentFile(File(selectedFile.files[0].path!)),
-          );
-
-          ref.read(appProvider.notifier).setAllRecentFiles(files);
-        }
-
-        Variables.animatedController!.reverse();
-        Variables.recentlyOpened = false;
-
-        openPanorama(selectedFile.paths[0]!, context);
+        openPanorama(RecentFile(File(selectedFile.paths[0]!)), context, ref);
       } on FileSystemException {
         openSnackBar(
             title: 'Error:',
@@ -70,20 +44,22 @@ class PanoramaHandler {
     ref.read(addPhotoState.notifier).completed();
   }
 
-  static void openPanorama(String panorama, context) async {
+  static void openPanorama(RecentFile panorama, context, ref) async {
     try {
       Variables.animatedController!.reverse();
       Variables.recentlyOpened = false;
 
-      String panExt = path.extension(panorama).trim().toLowerCase();
-
+      String panPath = panorama.file.path;
+      String panExt = path.extension(panPath).replaceAll(".", "").toLowerCase();
       bool isPhotoExtension = photoExtensions.contains(panExt);
 
       if (isPhotoExtension) {
+        ref.read(appProvider.notifier).movePanToRecently(panorama);
+
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => PanoramaView(panorama),
+          FluentPageRoute(
+            builder: (context) => PanoramaView(panPath),
           ),
         );
       } else {
@@ -93,34 +69,6 @@ class PanoramaHandler {
                 'The selected file is not supported. Spheroscopic only supports: .jpg, .png, .dng, .tiff',
             context: context);
       }
-    } on FileSystemException {
-      openSnackBar(
-          title: 'Error:',
-          text: 'The selected file cannot be opened. Check permissions.',
-          context: context);
-    } catch (error, stackTrace) {
-      await Sentry.captureException(
-        error,
-        stackTrace: stackTrace,
-      );
-
-      openSnackBar(title: 'Error:', text: '$error', context: context);
-    }
-  }
-
-  static void openRecentlyPanorama(RecentFile panorama, context, ref) async {
-    try {
-      ref.read(appProvider.notifier).movePanoramaToTop(panorama.id);
-
-      Variables.animatedController!.reverse();
-      Variables.recentlyOpened = false;
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PanoramaView(panorama.file.path),
-        ),
-      );
     } on FileSystemException {
       openSnackBar(
           title: 'Error:',

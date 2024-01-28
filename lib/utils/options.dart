@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:spheroscopic/class/recentFiles.dart';
-import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Options {
@@ -17,18 +16,6 @@ Future<void> initFunc(Brightness brightness) async {
     effect: WindowEffect.mica,
     dark: brightness == Brightness.dark ? true : false,
   );
-}
-
-String get appdataFolder {
-  final appData = Platform.environment['APPDATA']!;
-
-  // path to exiv2 folder in app's assets
-  String directoryPath = path.join(
-    appData,
-    'panorama_viewer',
-  );
-
-  return directoryPath;
 }
 
 enum Settings_keys {
@@ -87,30 +74,35 @@ class Settings extends ChangeNotifier {
     }
   }
 
-  void deleteAllRecentFile() {
+  void deleteAllRecentFiles() {
     _prefs.clear();
 
     notifyListeners();
   }
 
-  void movePanoramaToTop(Key fileid) {
-    List<RecentFile> currentRecentFiles = getRecentFiles();
+  void movePanToRecently(RecentFile panorama) {
+    List<RecentFile> currentFiles = getRecentFiles();
 
-    int indexToMove =
-        currentRecentFiles.indexWhere((file) => file.id == fileid);
+    int indexToMove = currentFiles.indexWhere((file) => file.id == panorama.id);
 
     if (indexToMove != -1) {
-      RecentFile panorama = currentRecentFiles[indexToMove];
+      RecentFile panorama = currentFiles[indexToMove];
 
-      currentRecentFiles.removeAt(indexToMove);
-      currentRecentFiles.add(panorama);
+      currentFiles.removeAt(indexToMove);
+      currentFiles.add(panorama);
+    } else {
+      if (currentFiles.length == 10) {
+        currentFiles.removeAt(0); // delete the old one
+      }
 
-      List<String> filePaths =
-          currentRecentFiles.map((file) => file.file.path).toList();
-
-      _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
-
-      notifyListeners();
+      currentFiles.add(panorama);
     }
+
+    List<String> filePaths =
+        currentFiles.map((file) => file.file.path).toList();
+
+    _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
+
+    notifyListeners();
   }
 }

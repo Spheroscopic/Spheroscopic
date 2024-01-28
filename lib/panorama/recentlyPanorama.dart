@@ -48,7 +48,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
         ref.watch(brightnessRef) == Brightness.dark ? true : false;
 
     List<RecentFile> recentFiles =
-        _checkFiles(ref.read(appProvider).getRecentFiles(), ref);
+        _checkFiles(ref.watch(appProvider).getRecentFiles(), ref);
 
     return Container(
       width: 250,
@@ -67,7 +67,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                 child: Button(
                   onPressed: () {
                     setState(() {
-                      ref.read(appProvider.notifier).deleteAllRecentFile();
+                      ref.read(appProvider.notifier).deleteAllRecentFiles();
                     });
                   },
                   child: const Text('Clear all'),
@@ -160,7 +160,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                           Button(
                             onPressed: () {
                               setState(() {
-                                PanoramaHandler.openRecentlyPanorama(
+                                PanoramaHandler.openPanorama(
                                     panorama, context, ref);
                               });
                             },
