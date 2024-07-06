@@ -1,7 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart' as m;
-import 'package:spheroscopic/panorama/recentlyPanorama.dart';
-import 'package:spheroscopic/photo/select_photo.dart';
+import 'package:spheroscopic/panorama/recentlyOpened.dart';
+import 'package:spheroscopic/panorama/select_panorama.dart';
 import 'package:spheroscopic/riverpod/photoState.dart';
 import 'package:spheroscopic/utils/consts.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -140,7 +140,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     height: 30,
                                   ),
                                   Text(
-                                    "Select or drop 360 panorama.",
+                                    "Drag and drop panoramas here",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

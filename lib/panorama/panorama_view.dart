@@ -50,14 +50,6 @@ class _PanoramaView extends ConsumerState<PanoramaView>
   }
 
   @override
-
-  /// Builds the PanoramaView widget, which displays a panoramic image and a bottom panel with navigation controls.
-  ///
-  /// The PanoramaView widget is responsible for rendering the panoramic image and providing a bottom panel with controls to navigate between multiple panoramic images (if available). The bottom panel can be pinned or unpinned, and it smoothly appears and disappears based on user interaction.
-  ///
-  /// The widget uses the [PanoramaViewer] to display the panoramic image, and the bottom panel is built using a combination of [Animate], [MouseRegion], and [ListView] widgets to provide the desired functionality and appearance.
-  ///
-  /// The selected panoramic image is determined by the [selected] property, and the list of available panoramic images is provided through the [panos] parameter. The [isPinned] property controls whether the bottom panel is pinned or not.
   Widget build(BuildContext context) {
     bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
 
@@ -210,7 +202,6 @@ class _PanoramaView extends ConsumerState<PanoramaView>
 
                                       bool isSelected = selected.id == id;
 
-                                      // Initialize the hover state for the index
                                       bool isHovering =
                                           hoverStates[index] ?? false;
 

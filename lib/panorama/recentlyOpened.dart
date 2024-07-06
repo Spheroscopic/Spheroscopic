@@ -1,13 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
-//import 'package:flutter/material.dart' as m;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spheroscopic/class/recentFile.dart';
-import 'package:spheroscopic/class/shared_preferences.dart';
-import 'package:spheroscopic/photo/select_photo.dart';
+import 'package:spheroscopic/modules/snackbar.dart';
+import 'package:spheroscopic/riverpod/settings.dart';
+import 'package:spheroscopic/panorama/select_panorama.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:spheroscopic/utils/consts.dart';
 import 'package:path/path.dart' as path;
-//import 'package:intl/intl.dart';
 
 class PanoPanel extends ConsumerStatefulWidget {
   const PanoPanel({super.key});
@@ -146,7 +145,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                             width: 230,
                             height: 80,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(6),
                               image: DecorationImage(
                                 image: img,
                                 fit: BoxFit.cover,
@@ -158,8 +157,15 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                           ),
                           Button(
                             onPressed: () {
-                              PanoramaHandler.openPanorama(
-                                  [filePath], context, ref);
+                              if (file.file.existsSync()) {
+                                PanoramaHandler.openPanorama(
+                                    [filePath], context, ref);
+                              } else {
+                                openSnackBar(
+                                    title: 'Error:',
+                                    text: 'Could not find the file!',
+                                    context: context);
+                              }
                             },
                             child: const Text(
                               'Open',

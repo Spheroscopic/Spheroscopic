@@ -1,9 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AddPhotosState extends StateNotifier<AsyncValue<void>> {
-  AddPhotosState(this.ref)
-      // set the initial state (synchronously)
-      : super(const AsyncData(null));
+  AddPhotosState(this.ref) : super(const AsyncData(null));
   final Ref ref;
 
   void loading() async {

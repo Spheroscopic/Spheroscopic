@@ -1,22 +1,8 @@
 import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:spheroscopic/class/recentFile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class Options {
-  // current platform: true - windows; false - mac
-  static bool currentPlatform() {
-    return Platform.isWindows ? true : false;
-  }
-}
-
-Future<void> initFunc(Brightness brightness) async {
-  await Window.setEffect(
-    effect: WindowEffect.mica,
-    dark: brightness == Brightness.dark ? true : false,
-  );
-}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum Settings_keys {
   recentFiles,
@@ -107,3 +93,12 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+final sharedPreferencesProvider = Provider<SharedPreferences>((_) {
+  return throw UnimplementedError();
+});
+
+// provider to work with AppTheme
+final appProvider = ChangeNotifierProvider((ref) {
+  return Settings(ref.watch(sharedPreferencesProvider));
+});

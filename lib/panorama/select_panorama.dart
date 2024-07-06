@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:spheroscopic/class/recentFile.dart';
-import 'package:spheroscopic/class/shared_preferences.dart';
+import 'package:spheroscopic/riverpod/settings.dart';
 import 'package:spheroscopic/modules/snackbar.dart';
 import 'package:spheroscopic/panorama/panorama_view.dart';
 import 'package:spheroscopic/riverpod/photoState.dart';
