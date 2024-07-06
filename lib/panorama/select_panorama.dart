@@ -61,7 +61,8 @@ class PanoramaHandler {
           } else {
             openSnackBar(
                 title: 'Error:',
-                text: 'The selected file was not found.',
+                text:
+                    'The selected file was not found. File path: ${file.path}',
                 context: context);
 
             ref

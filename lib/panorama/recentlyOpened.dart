@@ -26,27 +26,12 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
     super.dispose();
   }
 
-  List<RecentFile> _checkFiles(List<RecentFile> files, ref) {
-    List<RecentFile> recentFiles = [];
-
-    for (RecentFile file in files) {
-      if (file.file.file.existsSync()) {
-        recentFiles.add(file);
-      }
-    }
-
-    ref.read(appProvider.notifier).setAllRecentFiles(recentFiles);
-
-    return recentFiles;
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode =
         ref.watch(brightnessRef) == Brightness.dark ? true : false;
 
-    List<RecentFile> recentFiles =
-        _checkFiles(ref.watch(appProvider).getRecentFiles(), ref);
+    List<RecentFile> recentFiles = ref.watch(appProvider).checkAllFilesAndGet();
 
     return Container(
       width: 250,
@@ -72,9 +57,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             const Divider(),
             Expanded(
               child: ListView.builder(
@@ -98,8 +81,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                     padding:
                         const EdgeInsets.only(top: 10, left: 10, right: 10),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10.0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
@@ -138,9 +120,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 6,
-                          ),
+                          const SizedBox(height: 6),
                           Container(
                             width: 230,
                             height: 80,
@@ -152,9 +132,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 8,
-                          ),
+                          const SizedBox(height: 8),
                           Button(
                             onPressed: () {
                               if (file.file.existsSync()) {
@@ -167,9 +145,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                                     context: context);
                               }
                             },
-                            child: const Text(
-                              'Open',
-                            ),
+                            child: const Text('Open'),
                           ),
                         ],
                       ),

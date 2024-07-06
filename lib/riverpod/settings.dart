@@ -92,6 +92,22 @@ class Settings extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  List<RecentFile> checkAllFilesAndGet() {
+    List<RecentFile> currentFiles = getRecentFiles();
+
+    List<RecentFile> checkedFiles = [];
+
+    for (RecentFile file in currentFiles) {
+      if (file.file.file.existsSync()) {
+        checkedFiles.add(file);
+      }
+    }
+
+    setAllRecentFiles(checkedFiles);
+
+    return checkedFiles;
+  }
 }
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((_) {

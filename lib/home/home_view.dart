@@ -88,8 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               children: [
                 _dragging
                     ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 50, horizontal: 50),
+                        padding: const EdgeInsets.all(50),
                         child: DottedBorder(
                           color: TColor.colorOptions[0],
                           dashPattern: const [15, 15],
@@ -106,11 +105,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   size: 100,
                                   color: TColor.mainColor(isDarkMode),
                                 ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
+                                const SizedBox(height: 30),
                                 Text(
-                                  "Drop panorama file here!",
+                                  "Drop panoramas over here!",
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -123,8 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       )
                     : Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 5),
+                        padding: const EdgeInsets.all(5),
                         child: Stack(
                           children: [
                             Center(
@@ -136,20 +132,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     size: 100,
                                     color: TColor.mainColor(isDarkMode),
                                   ),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
+                                  const SizedBox(height: 30),
                                   Text(
-                                    "Drag and drop panoramas here",
+                                    "Select or drop panoramas here",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: TColor.mainColorText(isDarkMode),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
+                                  const SizedBox(height: 25),
                                   FilledButton(
                                     onPressed: addPhotoButtonState.isLoading
                                         ? null
@@ -169,9 +161,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           )
                                         : const Text('Select panorama'),
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const SizedBox(height: 10),
                                   Button(
                                     onPressed: () {
                                       setState(() {
@@ -196,11 +186,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 autoPlay: false,
                                 effects: [
                                   FadeEffect(
-                                    duration: 400.ms,
+                                    duration: 300.ms,
                                     delay: 100.ms,
                                   ),
                                   const MoveEffect(
-                                    begin: Offset(30, 0),
+                                    begin: Offset(15, 0),
                                     end: Offset(0, 0),
                                     curve: Curves.easeOutQuad,
                                   )
