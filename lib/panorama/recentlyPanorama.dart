@@ -1,12 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 //import 'package:flutter/material.dart' as m;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spheroscopic/class/recentFiles.dart';
+import 'package:spheroscopic/class/recentFile.dart';
 import 'package:spheroscopic/class/shared_preferences.dart';
 import 'package:spheroscopic/photo/select_photo.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:spheroscopic/utils/consts.dart';
-import 'dart:io';
 import 'package:path/path.dart' as path;
 //import 'package:intl/intl.dart';
 
@@ -32,7 +31,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
     List<RecentFile> recentFiles = [];
 
     for (RecentFile file in files) {
-      if (file.file.existsSync()) {
+      if (file.file.file.existsSync()) {
         recentFiles.add(file);
       }
     }
@@ -89,12 +88,12 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                       recentFiles[(recentFiles.length - 1) - index];
 
                   //Key id = panorama.id;
-                  File file = panorama.file;
+                  FileImage file = panorama.file;
                   ResizeImage img = panorama.img;
                   //String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(panorama.date);
 
-                  String filePath = file.path;
-                  String fileName = path.basename(file.path);
+                  String filePath = file.file.path;
+                  String fileName = path.basename(filePath);
 
                   return Padding(
                     padding:
@@ -159,38 +158,13 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                           ),
                           Button(
                             onPressed: () {
-                              setState(() {
-                                PanoramaHandler.openPanorama(
-                                    panorama, context, ref);
-                              });
+                              PanoramaHandler.openPanorama(
+                                  [filePath], context, ref);
                             },
                             child: const Text(
                               'Open',
                             ),
                           ),
-                          /* const SizedBox(
-                            height: 10,
-                          ),
-                          const m.Divider(
-                            indent: 0,
-                            thickness: 0.2,
-                            height: 0.1,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          SizedBox(
-                            width: 230,
-                            child: Text(
-                              date.toString(),
-                              style: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: TColor.secondColorText(isDarkMode),
-                              ),
-                            ),
-                          ), */
                         ],
                       ),
                     ),

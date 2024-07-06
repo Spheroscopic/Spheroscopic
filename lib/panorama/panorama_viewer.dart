@@ -328,12 +328,14 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _updateTexture(ImageInfo imageInfo, bool synchronousCall) {
-    surface?.mesh.texture = imageInfo.image;
-    surface?.mesh.textureRect = Rect.fromLTWH(0, 0,
-        imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
-    scene!.texture = imageInfo.image;
-    scene!.update();
-    widget.onImageLoad?.call();
+    if (surface?.mesh != null) {
+      surface?.mesh.texture = imageInfo.image;
+      surface?.mesh.textureRect = Rect.fromLTWH(0, 0,
+          imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
+      scene!.texture = imageInfo.image;
+      scene!.update();
+      widget.onImageLoad?.call();
+    }
   }
 
   void _loadTexture(ImageProvider? provider) {
@@ -344,7 +346,7 @@ class PanoramaState extends State<PanoramaViewer>
     _imageStream!.addListener(listener);
   }
 
-  void _onSceneCreated(Scene scene) {
+  void _onSceneCreated(Scene scene) async {
     this.scene = scene;
     scene.camera.near = 1.0;
     scene.camera.far = _radius + 1.0;
@@ -352,18 +354,32 @@ class PanoramaState extends State<PanoramaViewer>
     scene.camera.zoom = widget.zoom;
     scene.camera.position.setFrom(Vector3(0, 0, 0.1));
     if (widget.child != null) {
+      ui.Image? nn = await createTransparentImage();
+
       final Mesh mesh = generateSphereMesh(
-          radius: _radius,
-          latSegments: widget.latSegments,
-          lonSegments: widget.lonSegments,
-          croppedArea: widget.croppedArea,
-          croppedFullWidth: widget.croppedFullWidth,
-          croppedFullHeight: widget.croppedFullHeight);
+        radius: _radius,
+        latSegments: widget.latSegments,
+        lonSegments: widget.lonSegments,
+        croppedArea: widget.croppedArea,
+        croppedFullWidth: widget.croppedFullWidth,
+        croppedFullHeight: widget.croppedFullHeight,
+        texture: nn,
+      );
+
       surface = Object(name: 'surface', mesh: mesh, backfaceCulling: false);
       _loadTexture(widget.child!.image);
       scene.world.add(surface!);
       _updateView();
     }
+  }
+
+  Future<ui.Image> createTransparentImage() async {
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+    final paint = Paint()..color = const Color(0x00000000); // Прозрачный цвет
+    canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), paint);
+    final picture = pictureRecorder.endRecording();
+    return picture.toImage(1, 1);
   }
 
   Matrix4 matrixFromLatLon(double lat, double lon) {
