@@ -46,6 +46,14 @@ class _PanoramaView extends ConsumerState<PanoramaView>
   @override
   void dispose() {
     animatedController.dispose();
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+
+    for (var pano in panos) {
+      pano.file.evict();
+      pano.thumbnail.evict();
+    }
+
     super.dispose();
   }
 

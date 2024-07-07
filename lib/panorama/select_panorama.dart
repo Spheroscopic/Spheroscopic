@@ -27,37 +27,6 @@ class PanoramaHandler {
     return completer.future;
   }
 
-  // Open DialogBox for selecting photos
-  static void _selectPanorama(context, ref) async {
-    ref.read(addPhotoState.notifier).loading();
-
-    FilePickerResult? selectedFile = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: photoExtensions,
-      allowMultiple: true,
-    );
-
-    if (selectedFile != null) {
-      try {
-        await openPanorama(selectedFile.paths.cast<String>(), context, ref);
-      } on FileSystemException {
-        openSnackBar(
-            title: 'Error:',
-            text: 'The selected file cannot be opened. Check permissions.',
-            context: context);
-      } catch (error, stackTrace) {
-        await Sentry.captureException(
-          error,
-          stackTrace: stackTrace,
-        );
-
-        openSnackBar(title: 'Error:', text: '$error', context: context);
-      }
-    }
-
-    ref.read(addPhotoState.notifier).completed();
-  }
-
   static Future<void> openPanorama(List<String> panPath, context, ref) async {
     ref.read(addPhotoState.notifier).loading();
 
