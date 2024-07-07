@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class RecentFile {
   late final Key id;
   late final FileImage file;
-  late final ResizeImage img;
+  late final ImageProvider thumbnail;
   //final DateTime date = DateTime.now();
 
-  RecentFile(this.file) {
+  RecentFile(this.file, {int thumbnailWidth = 320, int thumbnailHeight = 80}) {
     id = Key(file.toString());
-    img = ResizeImage(
-      width: 320,
-      height: 80,
+    thumbnail = ResizeImage(
       file,
+      width: thumbnailWidth,
+      height: thumbnailHeight,
     );
   }
 }

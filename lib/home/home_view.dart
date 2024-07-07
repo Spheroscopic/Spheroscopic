@@ -148,8 +148,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     onPressed: addPhotoButtonState.isLoading
                                         ? null
                                         : () {
-                                            PanoramaHandler.selectPanorama(
-                                                context, ref);
+                                            PanoramaHandler.openPanorama(
+                                                [], context, ref);
                                             animatedController.reverse();
                                             recentlyOpened = false;
                                           },

@@ -71,7 +71,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
 
                   //Key id = panorama.id;
                   FileImage file = panorama.file;
-                  ResizeImage img = panorama.img;
+                  ImageProvider img = panorama.thumbnail;
                   //String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(panorama.date);
 
                   String filePath = file.file.path;

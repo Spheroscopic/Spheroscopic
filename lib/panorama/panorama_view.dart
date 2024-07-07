@@ -6,7 +6,7 @@ import 'package:spheroscopic/class/recentFile.dart';
 import 'package:spheroscopic/panorama/panorama_viewer.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:spheroscopic/utils/consts.dart';
-//import 'package:panorama_viewer/panorama_viewer.dart';
+//import 'package:panor this.thumbnailama_viewer/panorama_viewer.dart';
 
 class PanoramaView extends ConsumerStatefulWidget {
   final List<RecentFile>? panos;
@@ -197,7 +197,7 @@ class _PanoramaView extends ConsumerState<PanoramaView>
 
                                       Key id = panorama.id;
                                       FileImage file = panorama.file;
-                                      ResizeImage img = panorama.img;
+                                      ImageProvider img = panorama.thumbnail;
                                       String filePath = file.file.path;
 
                                       bool isSelected = selected.id == id;

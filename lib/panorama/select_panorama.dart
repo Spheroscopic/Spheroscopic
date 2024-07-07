@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -11,8 +12,23 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:path/path.dart' as path;
 
 class PanoramaHandler {
+  static Future<RecentFile> _loadImage(File file) async {
+    final Completer<RecentFile> completer = Completer();
+    final FileImage fileImage = FileImage(file);
+
+    fileImage.resolve(const ImageConfiguration()).addListener(
+          ImageStreamListener((ImageInfo info, bool synchronousCall) {
+            completer.complete(RecentFile(fileImage));
+          }, onError: (dynamic error, StackTrace? stackTrace) {
+            completer.completeError(error, stackTrace);
+          }),
+        );
+
+    return completer.future;
+  }
+
   // Open DialogBox for selecting photos
-  static void selectPanorama(context, ref) async {
+  static void _selectPanorama(context, ref) async {
     ref.read(addPhotoState.notifier).loading();
 
     FilePickerResult? selectedFile = await FilePicker.platform.pickFiles(
@@ -23,7 +39,7 @@ class PanoramaHandler {
 
     if (selectedFile != null) {
       try {
-        openPanorama(selectedFile.paths.cast<String>(), context, ref);
+        await openPanorama(selectedFile.paths.cast<String>(), context, ref);
       } on FileSystemException {
         openSnackBar(
             title: 'Error:',
@@ -42,7 +58,21 @@ class PanoramaHandler {
     ref.read(addPhotoState.notifier).completed();
   }
 
-  static void openPanorama(List<String> panPath, context, ref) async {
+  static Future<void> openPanorama(List<String> panPath, context, ref) async {
+    ref.read(addPhotoState.notifier).loading();
+
+    if (panPath.isEmpty) {
+      FilePickerResult? selectedFile = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: photoExtensions,
+        allowMultiple: true,
+      );
+
+      if (selectedFile != null) {
+        panPath = selectedFile.paths.cast<String>();
+      }
+    }
+
     List<RecentFile> panos = [];
 
     for (String pano in panPath) {
@@ -54,7 +84,8 @@ class PanoramaHandler {
           File file = File(pano);
 
           if (file.existsSync()) {
-            RecentFile rf = RecentFile(FileImage(file));
+            //RecentFile rf = RecentFile(FileImage(file));
+            RecentFile rf = await _loadImage(file);
 
             ref.read(appProvider.notifier).movePanToRecently(rf);
             panos.add(rf);
@@ -99,5 +130,7 @@ class PanoramaHandler {
         ),
       );
     }
+
+    ref.read(addPhotoState.notifier).completed();
   }
 }
