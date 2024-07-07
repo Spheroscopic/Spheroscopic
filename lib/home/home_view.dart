@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:spheroscopic/panorama/recentlyOpened.dart';
@@ -161,21 +163,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           )
                                         : const Text('Select panorama'),
                                   ),
-                                  const SizedBox(height: 10),
-                                  Button(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (recentlyOpened) {
-                                          animatedController.reverse();
-                                          recentlyOpened = false;
-                                        } else {
-                                          animatedController.forward();
-                                          recentlyOpened = true;
-                                        }
-                                      });
-                                    },
-                                    child: const Text('Recently opened'),
-                                  ),
+                                  if (Platform.isWindows)
+                                    const SizedBox(height: 10),
+                                  if (Platform.isWindows)
+                                    Button(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (recentlyOpened) {
+                                            animatedController.reverse();
+                                            recentlyOpened = false;
+                                          } else {
+                                            animatedController.forward();
+                                            recentlyOpened = true;
+                                          }
+                                        });
+                                      },
+                                      child: const Text('Recently opened'),
+                                    ),
                                 ],
                               ),
                             ),
