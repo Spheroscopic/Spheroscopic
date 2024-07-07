@@ -1,22 +1,8 @@
 import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:spheroscopic/class/recentFiles.dart';
+import 'package:spheroscopic/class/recentFile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class Options {
-  // current platform: true - windows; false - mac
-  static bool currentPlatform() {
-    return Platform.isWindows ? true : false;
-  }
-}
-
-Future<void> initFunc(Brightness brightness) async {
-  await Window.setEffect(
-    effect: WindowEffect.mica,
-    dark: brightness == Brightness.dark ? true : false,
-  );
-}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum Settings_keys {
   recentFiles,
@@ -31,8 +17,9 @@ class Settings extends ChangeNotifier {
     List<String> filePaths =
         _prefs.getStringList(Settings_keys.recentFiles.name) ?? [];
 
-    List<RecentFile> recentFiles =
-        filePaths.map((filePath) => RecentFile(File(filePath))).toList();
+    List<RecentFile> recentFiles = filePaths
+        .map((filePath) => RecentFile(FileImage(File(filePath))))
+        .toList();
 
     return recentFiles;
   }
@@ -42,7 +29,7 @@ class Settings extends ChangeNotifier {
     currentRecentFiles.add(newRecentFile);
 
     List<String> filePaths =
-        currentRecentFiles.map((file) => file.file.path).toList();
+        currentRecentFiles.map((file) => file.file.file.path).toList();
 
     _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
 
@@ -51,7 +38,7 @@ class Settings extends ChangeNotifier {
 
   void setAllRecentFiles(List<RecentFile> newRecentFile) {
     List<String> filePaths =
-        newRecentFile.map((file) => file.file.path).toList();
+        newRecentFile.map((file) => file.file.file.path).toList();
 
     _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
   }
@@ -66,7 +53,7 @@ class Settings extends ChangeNotifier {
       currentRecentFiles.removeAt(indexToRemove);
 
       List<String> filePaths =
-          currentRecentFiles.map((file) => file.file.path).toList();
+          currentRecentFiles.map((file) => file.file.file.path).toList();
 
       _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
 
@@ -99,10 +86,35 @@ class Settings extends ChangeNotifier {
     }
 
     List<String> filePaths =
-        currentFiles.map((file) => file.file.path).toList();
+        currentFiles.map((file) => file.file.file.path).toList();
 
     _prefs.setStringList(Settings_keys.recentFiles.name, filePaths);
 
     notifyListeners();
   }
+
+  List<RecentFile> checkAllFilesAndGet() {
+    List<RecentFile> currentFiles = getRecentFiles();
+
+    List<RecentFile> checkedFiles = [];
+
+    for (RecentFile file in currentFiles) {
+      if (file.file.file.existsSync()) {
+        checkedFiles.add(file);
+      }
+    }
+
+    setAllRecentFiles(checkedFiles);
+
+    return checkedFiles;
+  }
 }
+
+final sharedPreferencesProvider = Provider<SharedPreferences>((_) {
+  return throw UnimplementedError();
+});
+
+// provider to work with AppTheme
+final appProvider = ChangeNotifierProvider((ref) {
+  return Settings(ref.watch(sharedPreferencesProvider));
+});

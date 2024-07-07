@@ -1,9 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spheroscopic/class/shared_preferences.dart';
-import 'package:spheroscopic/selector/home_screen.dart';
-import 'package:spheroscopic/utils/options.dart';
+import 'package:spheroscopic/home/home_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -11,6 +9,14 @@ import 'package:system_theme/system_theme.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:spheroscopic/riverpod/settings.dart';
+
+Future<void> initFunc(Brightness brightness) async {
+  await Window.setEffect(
+    effect: WindowEffect.mica,
+    dark: brightness == Brightness.dark ? true : false,
+  );
+}
 
 void main(List<String>? args) async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,14 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
-//import 'package:flutter/material.dart' as m;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spheroscopic/class/recentFiles.dart';
-import 'package:spheroscopic/class/shared_preferences.dart';
-import 'package:spheroscopic/photo/select_photo.dart';
+import 'package:spheroscopic/class/recentFile.dart';
+import 'package:spheroscopic/modules/snackbar.dart';
+import 'package:spheroscopic/riverpod/settings.dart';
+import 'package:spheroscopic/panorama/select_panorama.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:spheroscopic/utils/consts.dart';
-import 'dart:io';
 import 'package:path/path.dart' as path;
-//import 'package:intl/intl.dart';
 
 class PanoPanel extends ConsumerStatefulWidget {
   const PanoPanel({super.key});
@@ -28,27 +26,12 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
     super.dispose();
   }
 
-  List<RecentFile> _checkFiles(List<RecentFile> files, ref) {
-    List<RecentFile> recentFiles = [];
-
-    for (RecentFile file in files) {
-      if (file.file.existsSync()) {
-        recentFiles.add(file);
-      }
-    }
-
-    ref.read(appProvider.notifier).setAllRecentFiles(recentFiles);
-
-    return recentFiles;
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode =
         ref.watch(brightnessRef) == Brightness.dark ? true : false;
 
-    List<RecentFile> recentFiles =
-        _checkFiles(ref.watch(appProvider).getRecentFiles(), ref);
+    List<RecentFile> recentFiles = ref.watch(appProvider).checkAllFilesAndGet();
 
     return Container(
       width: 250,
@@ -74,9 +57,7 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             const Divider(),
             Expanded(
               child: ListView.builder(
@@ -89,19 +70,18 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                       recentFiles[(recentFiles.length - 1) - index];
 
                   //Key id = panorama.id;
-                  File file = panorama.file;
+                  FileImage file = panorama.file;
                   ResizeImage img = panorama.img;
                   //String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(panorama.date);
 
-                  String filePath = file.path;
-                  String fileName = path.basename(file.path);
+                  String filePath = file.file.path;
+                  String fileName = path.basename(filePath);
 
                   return Padding(
                     padding:
                         const EdgeInsets.only(top: 10, left: 10, right: 10),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10.0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
@@ -140,57 +120,33 @@ class _PanoPanel extends ConsumerState<PanoPanel> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 6,
-                          ),
+                          const SizedBox(height: 6),
                           Container(
                             width: 230,
                             height: 80,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(6),
                               image: DecorationImage(
                                 image: img,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 8,
-                          ),
+                          const SizedBox(height: 8),
                           Button(
                             onPressed: () {
-                              setState(() {
+                              if (file.file.existsSync()) {
                                 PanoramaHandler.openPanorama(
-                                    panorama, context, ref);
-                              });
+                                    [filePath], context, ref);
+                              } else {
+                                openSnackBar(
+                                    title: 'Error:',
+                                    text: 'Could not find the file!',
+                                    context: context);
+                              }
                             },
-                            child: const Text(
-                              'Open',
-                            ),
+                            child: const Text('Open'),
                           ),
-                          /* const SizedBox(
-                            height: 10,
-                          ),
-                          const m.Divider(
-                            indent: 0,
-                            thickness: 0.2,
-                            height: 0.1,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          SizedBox(
-                            width: 230,
-                            child: Text(
-                              date.toString(),
-                              style: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: TColor.secondColorText(isDarkMode),
-                              ),
-                            ),
-                          ), */
                         ],
                       ),
                     ),

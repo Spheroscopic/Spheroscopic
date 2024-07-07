@@ -161,56 +161,7 @@ class PanoramaState extends State<PanoramaViewer>
   Stream<Null>? _stream;
   ImageStream? _imageStream;
 
-  void _handleTapUp(PointerUpEvent details) {
-    final Vector3 o =
-        positionToLatLon(details.localPosition.dx, details.localPosition.dy);
-    widget.onTap!(degrees(o.x), degrees(-o.y), degrees(o.z));
-  }
-
-  void _handleMoveStart(PointerDownEvent details) {
-    _lastFocalPoint = details.localPosition;
-  }
-
-  void _handleMoveUpdate(PointerMoveEvent details) {
-    final offset = details.localPosition - _lastFocalPoint;
-    _lastFocalPoint = details.localPosition;
-    latitudeDelta += widget.sensitivity *
-        0.5 *
-        math.pi *
-        offset.dy /
-        scene!.camera.viewportHeight;
-    longitudeDelta -= widget.sensitivity *
-        _animateDirection *
-        0.5 *
-        math.pi *
-        offset.dx /
-        scene!.camera.viewportHeight;
-
-    if (widget.sensorControl == SensorControl.none &&
-        !_controller.isAnimating) {
-      _controller.reset();
-      if (widget.animSpeed != 0) {
-        _controller.repeat();
-      } else {
-        _controller.forward();
-      }
-    }
-  }
-
-  void _handleScaleUpdate(double zoomScale) {
-    double zoomSpeed = zoomScale * 0.2; // Коэффициент скорости
-    _targetZoom =
-        (_currentZoom + zoomSpeed).clamp(widget.minZoom, widget.maxZoom);
-    if (_targetZoom != _currentZoom) {
-      _currentZoom = _targetZoom;
-      _controller.reset();
-      if (widget.animSpeed != 0) {
-        _controller.repeat();
-      } else {
-        _controller.forward();
-      }
-    }
-  }
+  double _lastTrackpadScale = 1.0;
 
   void _updateView() {
     if (scene == null) return;
@@ -328,12 +279,14 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _updateTexture(ImageInfo imageInfo, bool synchronousCall) {
-    surface?.mesh.texture = imageInfo.image;
-    surface?.mesh.textureRect = Rect.fromLTWH(0, 0,
-        imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
-    scene!.texture = imageInfo.image;
-    scene!.update();
-    widget.onImageLoad?.call();
+    if (surface?.mesh != null) {
+      surface?.mesh.texture = imageInfo.image;
+      surface?.mesh.textureRect = Rect.fromLTWH(0, 0,
+          imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
+      scene!.texture = imageInfo.image;
+      scene!.update();
+      widget.onImageLoad?.call();
+    }
   }
 
   void _loadTexture(ImageProvider? provider) {
@@ -344,7 +297,7 @@ class PanoramaState extends State<PanoramaViewer>
     _imageStream!.addListener(listener);
   }
 
-  void _onSceneCreated(Scene scene) {
+  void _onSceneCreated(Scene scene) async {
     this.scene = scene;
     scene.camera.near = 1.0;
     scene.camera.far = _radius + 1.0;
@@ -352,18 +305,32 @@ class PanoramaState extends State<PanoramaViewer>
     scene.camera.zoom = widget.zoom;
     scene.camera.position.setFrom(Vector3(0, 0, 0.1));
     if (widget.child != null) {
+      ui.Image? nn = await createTransparentImage();
+
       final Mesh mesh = generateSphereMesh(
-          radius: _radius,
-          latSegments: widget.latSegments,
-          lonSegments: widget.lonSegments,
-          croppedArea: widget.croppedArea,
-          croppedFullWidth: widget.croppedFullWidth,
-          croppedFullHeight: widget.croppedFullHeight);
+        radius: _radius,
+        latSegments: widget.latSegments,
+        lonSegments: widget.lonSegments,
+        croppedArea: widget.croppedArea,
+        croppedFullWidth: widget.croppedFullWidth,
+        croppedFullHeight: widget.croppedFullHeight,
+        texture: nn,
+      );
+
       surface = Object(name: 'surface', mesh: mesh, backfaceCulling: false);
       _loadTexture(widget.child!.image);
       scene.world.add(surface!);
       _updateView();
     }
+  }
+
+  Future<ui.Image> createTransparentImage() async {
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+    final paint = Paint()..color = const Color(0x00000000); // Прозрачный цвет
+    canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), paint);
+    final picture = pictureRecorder.endRecording();
+    return picture.toImage(1, 1);
   }
 
   Matrix4 matrixFromLatLon(double lat, double lon) {
@@ -503,19 +470,90 @@ class PanoramaState extends State<PanoramaViewer>
     );
 
     return widget.interactive
-        ? Listener(
-            onPointerDown: _handleMoveStart,
-            onPointerMove: _handleMoveUpdate,
-            onPointerSignal: (pointerSignal) {
-              if (pointerSignal is PointerScrollEvent) {
-                double zoom = pointerSignal.scrollDelta.dy * 0.02;
-                _handleScaleUpdate(zoom);
+        ? GestureDetector(
+            onScaleUpdate: (details) {
+              double zoomSpeed = details.scale * 0.2;
+              if (details.scale < _lastTrackpadScale) {
+                zoomSpeed *= -2 / _lastTrackpadScale;
               }
+              if (details.scale != 1) {
+                //print("b: $_currentZoom");
+                _handleScaleUpdate(zoomSpeed);
+                //print("c: $_currentZoom");
+                _lastTrackpadScale = details.scale;
+              }
+              //print('ScaleUpdateDetails: ${details.scale != 1 ? 'scale' : 'click/drag'} - {pointerCount: ${details.pointerCount}, focalPoint: ${details.focalPoint}, localFocalPoint: ${details.localFocalPoint}, focalPointDelta: ${details.focalPointDelta}, rotation: ${details.rotation}, scale: ${details.scale}, horizontalScale: ${details.horizontalScale}, verticalScale: ${details.verticalScale}');
             },
-            onPointerUp: widget.onTap == null ? null : _handleTapUp,
-            child: pano,
+            onScaleEnd: (details) {
+              //print('ScaleEND {pointerCount: ${details.pointerCount}, velocity: ${details.velocity}, scaleVelocity: ${details.scaleVelocity}}');
+            },
+            child: Listener(
+              onPointerPanZoomEnd: (details) {},
+              onPointerDown: _handleMoveStart,
+              onPointerMove: _handleMoveUpdate,
+              onPointerSignal: (pointerSignal) {
+                if (pointerSignal is PointerScrollEvent) {
+                  double zoom = pointerSignal.scrollDelta.dy * 0.02;
+                  _handleScaleUpdate(zoom);
+                }
+              },
+              onPointerUp: widget.onTap == null ? null : _handleTapUp,
+              child: pano,
+            ),
           )
         : pano;
+  }
+
+  void _handleTapUp(PointerUpEvent details) {
+    final Vector3 o =
+        positionToLatLon(details.localPosition.dx, details.localPosition.dy);
+    widget.onTap!(degrees(o.x), degrees(-o.y), degrees(o.z));
+  }
+
+  void _handleMoveStart(PointerDownEvent details) {
+    _lastFocalPoint = details.localPosition;
+  }
+
+  void _handleMoveUpdate(PointerMoveEvent details) {
+    final offset = details.localPosition - _lastFocalPoint;
+    _lastFocalPoint = details.localPosition;
+    latitudeDelta += widget.sensitivity *
+        0.5 *
+        math.pi *
+        offset.dy /
+        scene!.camera.viewportHeight;
+    longitudeDelta -= widget.sensitivity *
+        _animateDirection *
+        0.5 *
+        math.pi *
+        offset.dx /
+        scene!.camera.viewportHeight;
+
+    if (widget.sensorControl == SensorControl.none &&
+        !_controller.isAnimating) {
+      _controller.reset();
+      if (widget.animSpeed != 0) {
+        _controller.repeat();
+      } else {
+        _controller.forward();
+      }
+    }
+  }
+
+  void _handleScaleUpdate(double zoomScale) {
+    //print("Zoom scale: $zoomScale");
+    double zoomSpeed = zoomScale * 0.2; // Adjust the speed if necessary
+    _targetZoom =
+        (_currentZoom + zoomSpeed).clamp(widget.minZoom, widget.maxZoom);
+    if (_targetZoom != _currentZoom) {
+      _currentZoom = _targetZoom;
+      _controller.reset();
+      if (widget.animSpeed != 0) {
+        _controller.repeat();
+      } else {
+        _controller.forward();
+      }
+    }
   }
 }
 
