@@ -1,89 +1,81 @@
 name: spheroscopic
 description: "A new Flutter project."
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.1.4
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
+    sdk: ">=3.2.3 <4.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
+    flutter:
+        sdk: flutter
 
-  panorama_viewer: ^1.0.2
-  flutter_riverpod: ^2.4.9
-  imageview360: ^1.3.0
-  file_picker: ^6.1.1
-  desktop_drop: ^0.4.4
-  dotted_border: ^2.1.0
-  dchs_motion_sensors: ^1.0.2
-  flutter_cube: ^0.1.1
-  sentry_flutter: ^7.14.0
-  flutter_acrylic: ^1.1.3
-  fluent_ui: ^4.8.4
-  system_theme: ^2.3.1
-  path: ^1.8.3
-  flutter_animate: ^4.3.0
-  shared_preferences: ^2.2.2
-  transparent_image: ^2.0.1
-  window_manager: ^0.3.7
-  vr_player: ^0.2.2
+    panorama_viewer: ^1.0.2
+    flutter_riverpod: ^2.4.9
+    file_picker: ^6.1.1
+    desktop_drop: ^0.4.4
+    dotted_border: ^2.1.0
+    dchs_motion_sensors: ^1.0.2
+    flutter_cube: ^0.1.1
+    sentry_flutter: ^7.14.0
+    flutter_acrylic: ^1.1.3
+    fluent_ui: ^4.8.4
+    system_theme: ^2.3.1
+    path: ^1.8.3
+    flutter_animate: ^4.3.0
+    shared_preferences: ^2.2.2
+    window_manager: ^0.3.7
 
-
-  
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+    flutter_test:
+        sdk: flutter
 
-  flutter_lints: ^3.0.1
-  flutter_launcher_icons: "^0.13.1"
-  msix: ^3.16.7
-  build_runner: ^2.4.7
+    flutter_lints: ^3.0.1
+    flutter_launcher_icons: "^0.13.1"
+    msix: ^3.16.7
+    build_runner: ^2.4.7
 
 flutter_launcher_icons:
-  image_path: "assets/img/Logo.ico"
-  windows:
-    generate: true
     image_path: "assets/img/Logo.ico"
-    icon_size: 256 # min:48, max:256, default: 48
+    windows:
+        generate: true
+        image_path: "assets/img/Logo.ico"
+        icon_size: 256 # min:48, max:256, default: 48
 
 msix_config:
-  display_name: Spheroscopic
-  publisher_display_name: Artem Bagin
-  publisher: CN=DDE4AEE6-9493-4839-AD4F-C696473218F4
-  identity_name: 63552ArtemBagin.Spheroscopic
-  store: true
+    display_name: Spheroscopic
+    publisher_display_name: Artem Bagin
+    publisher: CN=DDE4AEE6-9493-4839-AD4F-C696473218F4
+    identity_name: 63552ArtemBagin.Spheroscopic
+    store: true
 
+    languages: en-us
+    logo_path: "assets/img/Logo.ico"
 
-
-  languages: en-us
-  logo_path: "assets/img/Logo.ico"
-
-  context_menu:
-    dll_path: assets/OpenWithSpheroscopic_CM.dll
-    items:
-      - type: .jpg
-        commands:
-          - id: YourAppMenuCommand
-            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
-      - type: .png
-        commands:
-          - id: YourAppMenuCommand
-            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
-      - type: .tif
-        commands:
-          - id: YourAppMenuCommand
-            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
-      - type: .tiff
-        commands:
-          - id: YourAppMenuCommand
-            clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
-
+    context_menu:
+        dll_path: assets/OpenWithSpheroscopic_CM.dll
+        items:
+            - type: .jpg
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .png
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .tif
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .tiff
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
 
 flutter:
-  uses-material-design: true
+    uses-material-design: true
 
-  assets:
-    - assets/img/
+    assets:
+        - assets/img/
