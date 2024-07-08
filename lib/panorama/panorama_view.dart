@@ -23,29 +23,35 @@ class _PanoramaView extends ConsumerState<PanoramaView>
   late final AnimationController animatedController;
   late RecentFile selected;
 
+  Key hovered = UniqueKey();
+
   bool isPinned = false;
 
   // fixes a bug with addPostFrameCallback causes the bottomPanel to dissapears after each rebuild
   bool wasBuilt = false;
 
-  final Map<int, bool> hoverStates = {};
+  final _controller = ScrollController();
 
   @override
   void initState() {
     panos = widget.panos!;
-    isPinned = panos.length > 1 ? false : true;
+
     selected = panos[0];
+    isPinned = panos.length > 1 ? false : true;
+
     animatedController = AnimationController(
       value: 1.0,
       vsync: this,
       duration: const Duration(seconds: 1),
     );
+
     super.initState();
   }
 
   @override
   void dispose() {
     animatedController.dispose();
+
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
 
@@ -199,6 +205,7 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                   child: ListView.builder(
                                     clipBehavior: Clip.antiAlias,
                                     scrollDirection: Axis.horizontal,
+                                    controller: _controller,
                                     itemCount: panos.length,
                                     itemBuilder: (context, index) {
                                       RecentFile panorama = panos[index];
@@ -209,9 +216,7 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                       String filePath = file.file.path;
 
                                       bool isSelected = selected.id == id;
-
-                                      bool isHovering =
-                                          hoverStates[index] ?? false;
+                                      bool isHovering = hovered == id;
 
                                       return Padding(
                                         padding: const EdgeInsets.all(5),
@@ -224,7 +229,8 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                           onHover: (value) {
                                             if (!isSelected) {
                                               _setState(() {
-                                                hoverStates[index] = value;
+                                                hovered =
+                                                    value ? id : UniqueKey();
                                               });
                                             }
                                           },

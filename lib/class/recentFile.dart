@@ -7,7 +7,7 @@ class RecentFile {
   //final DateTime date = DateTime.now();
 
   RecentFile(this.file, {int thumbnailWidth = 320, int thumbnailHeight = 80}) {
-    id = Key(file.toString());
+    id = Key(file.file.path);
     thumbnail = ResizeImage(
       file,
       width: thumbnailWidth,

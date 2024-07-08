@@ -55,6 +55,7 @@ class PanoramaHandler {
           if (file.existsSync()) {
             //RecentFile rf = RecentFile(FileImage(file));
             RecentFile rf = await _loadImage(file);
+            print(rf.file.file.path);
 
             ref.read(appProvider.notifier).movePanToRecently(rf);
             panos.add(rf);
