@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,10 +27,11 @@ void main(List<String>? args) async {
   await windowManager.ensureInitialized();
 
   // for setting minimal size of window
-  WindowOptions windowOptions = const WindowOptions(
-    minimumSize: Size(600, 400),
+  WindowOptions windowOptions = WindowOptions(
+    minimumSize: const Size(600, 400),
     title: "Spheroscopic",
-    titleBarStyle: TitleBarStyle.hidden,
+    titleBarStyle:
+        Platform.isMacOS ? TitleBarStyle.hidden : TitleBarStyle.normal,
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
