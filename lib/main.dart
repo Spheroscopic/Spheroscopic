@@ -28,6 +28,8 @@ void main(List<String>? args) async {
   // for setting minimal size of window
   WindowOptions windowOptions = const WindowOptions(
     minimumSize: Size(600, 400),
+    title: "Spheroscopic",
+    titleBarStyle: TitleBarStyle.hidden,
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
