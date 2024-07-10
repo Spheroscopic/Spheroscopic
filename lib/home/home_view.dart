@@ -13,12 +13,13 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen(this.args, {super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreen();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreen extends ConsumerState<HomeScreen> {
   late List<String> args;
+
+  bool _dragging = false;
 
   @override
   void initState() {
@@ -28,17 +29,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  bool _dragging = false;
-
-  @override
   Widget build(BuildContext context) {
-    final addPhotoButtonState = ref.watch(addPhotoState);
-    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print("HomeScreen build finished");
 
@@ -69,87 +60,101 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         },
         child: Mica(
           backgroundColor: Colors.transparent,
-          child: Stack(
-            children: [
-              _dragging
-                  ? Padding(
-                      padding: const EdgeInsets.all(50),
-                      child: DottedBorder(
-                        color: TColor.colorOptions[0],
-                        dashPattern: const [15, 15],
-                        borderType: BorderType.RRect,
-                        radius: const Radius.circular(25),
-                        strokeWidth: 5,
-                        strokeCap: StrokeCap.round,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                m.Icons.upload_file,
-                                size: 100,
-                                color: TColor.mainColor(isDarkMode),
-                              ),
-                              const SizedBox(height: 30),
-                              Text(
-                                "Drop panoramas over here!",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: TColor.mainColorText(isDarkMode),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  m.Icons.upload_file,
-                                  size: 100,
-                                  color: TColor.mainColor(isDarkMode),
-                                ),
-                                const SizedBox(height: 30),
-                                Text(
-                                  "Select or drop panoramas here",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: TColor.mainColorText(isDarkMode),
-                                  ),
-                                ),
-                                const SizedBox(height: 25),
-                                FilledButton(
-                                  onPressed: addPhotoButtonState.isLoading
-                                      ? null
-                                      : () {
-                                          PanoramaHandler.openPanorama(
-                                              [], context, ref);
-                                        },
-                                  child: addPhotoButtonState.isLoading
-                                      ? const SizedBox(
-                                          height: 20.0,
-                                          width: 20.0,
-                                          child: Center(
-                                            child: ProgressRing(),
-                                          ),
-                                        )
-                                      : const Text('Select panorama'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _dragging
+                ? DragContainer(key: UniqueKey())
+                : SelectContainer(key: UniqueKey()),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SelectContainer extends ConsumerWidget {
+  const SelectContainer({super.key});
+
+  @override
+  Widget build(context, ref) {
+    final addPhotoButtonState = ref.watch(addPhotoState);
+    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            m.Icons.upload_file,
+            size: 100,
+            color: TColor.mainColor(isDarkMode),
+          ),
+          const SizedBox(height: 30),
+          Text(
+            "Select or drop panoramas here",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: TColor.mainColorText(isDarkMode),
+            ),
+          ),
+          const SizedBox(height: 25),
+          FilledButton(
+            onPressed: addPhotoButtonState.isLoading
+                ? null
+                : () {
+                    PanoramaHandler.openPanorama([], context, ref);
+                  },
+            child: addPhotoButtonState.isLoading
+                ? const SizedBox(
+                    height: 20.0,
+                    width: 20.0,
+                    child: Center(
+                      child: ProgressRing(),
                     ),
+                  )
+                : const Text('Select panorama'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DragContainer extends ConsumerWidget {
+  const DragContainer({super.key});
+
+  @override
+  Widget build(context, ref) {
+    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.all(50),
+      child: DottedBorder(
+        color: TColor.colorOptions[0],
+        dashPattern: const [15, 15],
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(25),
+        strokeWidth: 5,
+        strokeCap: StrokeCap.round,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                m.Icons.file_download_outlined,
+                size: 100,
+                color: TColor.mainColor(isDarkMode),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                "Drop panoramas over here!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: TColor.mainColorText(isDarkMode),
+                ),
+              ),
             ],
           ),
         ),

@@ -71,6 +71,28 @@ class _PanoramaView extends ConsumerState<PanoramaView>
     super.dispose();
   }
 
+  Widget iconContainer(Widget icon, bool isDarkMode) {
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25),
+              offset: const Offset(0, 4),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+          ],
+          color: TColor.secondColor(isDarkMode),
+          border: Border.all(
+            color: TColor.secondColor_selected(isDarkMode),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: icon);
+  }
+
   @override
   Widget build(BuildContext cotext) {
     bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
@@ -135,7 +157,7 @@ class _PanoramaView extends ConsumerState<PanoramaView>
               ),
             ),
             StatefulBuilder(
-              builder: (BuildContext context, StateSetter _setState) {
+              builder: (context, _setState) {
                 // the bottomPanel smoothly dissapears after init, just to make it look cool
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (panos.length > 1 && !isPinned && !wasBuilt) {
@@ -171,27 +193,8 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                     m.MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: m.CrossAxisAlignment.end,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2.0, vertical: 2.0),
-                                    decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.25),
-                                          offset: const Offset(0, 4),
-                                          blurRadius: 4,
-                                          spreadRadius: 0,
-                                        ),
-                                      ],
-                                      color: TColor.secondColor(isDarkMode),
-                                      border: Border.all(
-                                        color: TColor.secondColor_selected(
-                                            isDarkMode),
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: IconButton(
+                                  iconContainer(
+                                    IconButton(
                                       icon: Icon(
                                         isPinned
                                             ? FluentIcons.pinned_solid
@@ -204,35 +207,20 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                         });
                                       },
                                     ),
+                                    isDarkMode,
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2.0, vertical: 2.0),
-                                    decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.25),
-                                          offset: const Offset(0, 4),
-                                          blurRadius: 4,
-                                          spreadRadius: 0,
-                                        ),
-                                      ],
-                                      color: TColor.secondColor(isDarkMode),
-                                      border: Border.all(
-                                        color: TColor.secondColor_selected(
-                                            isDarkMode),
-                                        width: 1,
+                                  iconContainer(
+                                    IconButton(
+                                      icon: const Icon(
+                                        FluentIcons.back,
+                                        size: 16.0,
                                       ),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(FluentIcons.back,
-                                          size: 16.0),
                                       onPressed: () {
                                         Navigator.popUntil(
                                             context, (route) => route.isFirst);
                                       },
                                     ),
+                                    isDarkMode,
                                   ),
                                 ],
                               ),
@@ -268,9 +256,8 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                         RecentFile panorama = panos[index];
 
                                         Key id = panorama.id;
-                                        FileImage file = panorama.file;
-                                        ImageProvider img = panorama.thumbnail;
-                                        String filePath = file.file.path;
+                                        String filePath =
+                                            panorama.file.file.path;
 
                                         bool isSelected =
                                             selectedIndex == index;
@@ -336,7 +323,7 @@ class _PanoramaView extends ConsumerState<PanoramaView>
                                                         BorderRadius.circular(
                                                             4),
                                                     image: DecorationImage(
-                                                      image: img,
+                                                      image: panorama.thumbnail,
                                                       fit: BoxFit.cover,
                                                     ),
                                                   ),

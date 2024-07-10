@@ -6,7 +6,7 @@ class RecentFile {
   late final ImageProvider thumbnail;
   //final DateTime date = DateTime.now();
 
-  RecentFile(this.file, {int thumbnailWidth = 320, int thumbnailHeight = 80}) {
+  RecentFile(this.file, {int thumbnailWidth = 110, int thumbnailHeight = 80}) {
     id = Key(file.file.path);
     thumbnail = ResizeImage(
       file,
