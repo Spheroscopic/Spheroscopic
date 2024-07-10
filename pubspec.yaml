@@ -25,7 +25,6 @@ dependencies:
     system_theme: ^2.3.1
     path: ^1.8.3
     flutter_animate: ^4.3.0
-    shared_preferences: ^2.2.2
     window_manager: ^0.3.7
 
 dev_dependencies:

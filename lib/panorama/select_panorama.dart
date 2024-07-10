@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:spheroscopic/class/recentFile.dart';
-import 'package:spheroscopic/riverpod/settings.dart';
 import 'package:spheroscopic/modules/snackbar.dart';
 import 'package:spheroscopic/panorama/panorama_view.dart';
 import 'package:spheroscopic/riverpod/photoState.dart';
@@ -57,7 +56,6 @@ class PanoramaHandler {
             RecentFile rf = await _loadImage(file);
             print(rf.file.file.path);
 
-            ref.read(appProvider.notifier).movePanToRecently(rf);
             panos.add(rf);
           } else {
             openSnackBar(
@@ -65,10 +63,6 @@ class PanoramaHandler {
                 text:
                     'The selected file was not found. File path: ${file.path}',
                 context: context);
-
-            ref
-                .read(appProvider.notifier)
-                .deleteRecentFile(FileImage(file).toString());
           }
         } else {
           openSnackBar(

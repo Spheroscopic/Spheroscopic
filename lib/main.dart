@@ -8,9 +8,7 @@ import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:spheroscopic/riverpod/brightness.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:spheroscopic/riverpod/settings.dart';
 
 Future<void> initFunc(Brightness brightness) async {
   await Window.setEffect(
@@ -47,9 +45,6 @@ void main(List<String>? args) async {
   Brightness brightness = PlatformDispatcher.instance.platformBrightness;
   await initFunc(brightness);
 
-  // initialization SharedPreferences
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-
   await SentryFlutter.init(
     (options) {
       options.dsn =
@@ -60,9 +55,6 @@ void main(List<String>? args) async {
     },
     appRunner: () => runApp(
       ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
         child: MyApp(args),
       ),
     ),
