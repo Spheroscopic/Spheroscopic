@@ -100,6 +100,13 @@ class SelectContainer extends ConsumerWidget {
           ),
           const SizedBox(height: 25),
           FilledButton(
+            style: const ButtonStyle(
+              textStyle: WidgetStatePropertyAll(
+                  TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              padding: WidgetStatePropertyAll(
+                EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              ),
+            ),
             onPressed: addPhotoButtonState.isLoading
                 ? null
                 : () {
