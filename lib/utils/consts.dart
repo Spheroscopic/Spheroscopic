@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
 
 // files
-const List<String> photoExtensions = ['jpg', 'png', 'dng', 'tif'];
+const List<String> photoExtensions = [
+  'jpg',
+  'jpeg',
+  'jpe',
+  'png',
+  'dng',
+  'tiff',
+  'tif'
+];
 
 class TColor {
-  static const Color m3BaseColor = Color(0xff6750a4);
-
   static const List<Color> colorOptions = [
-    m3BaseColor,
+    Color(0xff6750a4), // m3BaseColor
     Colors.blue,
     Colors.teal,
     Colors.green,
     Colors.yellow,
     Colors.orange,
     Colors.pink
-  ];
-
-  static const List<String> colorText = <String>[
-    "purple",
-    "blue",
-    "teal",
-    "green",
-    "yellow",
-    "orange",
-    "pink",
   ];
 
   // get theme colors
