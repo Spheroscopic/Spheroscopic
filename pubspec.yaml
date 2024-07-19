@@ -26,6 +26,7 @@ dependencies:
     path: ^1.8.3
     flutter_animate: ^4.3.0
     window_manager: ^0.3.7
+    url_launcher: ^6.3.0
 
 dev_dependencies:
     flutter_test:
