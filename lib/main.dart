@@ -97,11 +97,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       await initFunc(brightness);
     };
 
-    GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
-
     return SystemThemeBuilder(
       builder: (context, accent) => FluentApp(
-        navigatorKey: key,
+        navigatorKey: GlobalKey<NavigatorState>(),
         theme: FluentThemeData(
           accentColor: accent.accent.toAccentColor(),
           brightness: brightness,

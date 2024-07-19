@@ -517,12 +517,15 @@ class PanoramaState extends State<PanoramaViewer>
   void _handleMoveUpdate(PointerMoveEvent details) {
     final offset = details.localPosition - _lastFocalPoint;
     _lastFocalPoint = details.localPosition;
-    latitudeDelta += widget.sensitivity *
+    latitudeDelta += widget.sensitivity /
+        _currentZoom *
+        _animateDirection *
         0.5 *
         math.pi *
         offset.dy /
         scene!.camera.viewportHeight;
-    longitudeDelta -= widget.sensitivity *
+    longitudeDelta -= widget.sensitivity /
+        _currentZoom *
         _animateDirection *
         0.5 *
         math.pi *
