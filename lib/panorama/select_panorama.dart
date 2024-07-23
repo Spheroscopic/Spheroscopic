@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:spheroscopic/class/recentFile.dart';
 import 'package:spheroscopic/modules/snackbar.dart';
@@ -30,14 +30,16 @@ class PanoramaHandler {
     ref.read(addPhotoState.notifier).loading();
 
     if (panPath.isEmpty) {
-      FilePickerResult? selectedFile = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: photoExtensions,
-        allowMultiple: true,
+      final List<XFile> files = await openFiles(
+        acceptedTypeGroups: [
+          const XTypeGroup(extensions: photoExtensions),
+        ],
       );
 
-      if (selectedFile != null) {
-        panPath = selectedFile.paths.cast<String>();
+      if (files.isNotEmpty) {
+        for (var file in files) {
+          panPath.add(file.path);
+        }
       }
     }
 

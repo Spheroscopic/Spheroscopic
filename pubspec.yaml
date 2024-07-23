@@ -14,7 +14,7 @@ dependencies:
 
     panorama_viewer: ^1.0.2
     flutter_riverpod: ^2.4.9
-    file_picker: ^8.0.6
+    file_selector: ^1.0.3
     desktop_drop: ^0.4.4
     dotted_border: ^2.1.0
     dchs_motion_sensors: ^1.0.2
@@ -38,11 +38,13 @@ dev_dependencies:
     build_runner: ^2.4.7
 
 flutter_launcher_icons:
-    image_path: "assets/img/Logo.ico"
+    image_path: "assets/img/Logo-512.png"
     windows:
         generate: true
-        image_path: "assets/img/Logo.ico"
-        icon_size: 256 # min:48, max:256, default: 48
+        icon_size: 48 # min:48, max:256, default: 48
+    macos:
+        generate: true
+        image_path: "assets/img/MacOS-Logo-1024.png"
 
 msix_config:
     display_name: Spheroscopic
@@ -52,7 +54,7 @@ msix_config:
     store: true
 
     languages: en-us
-    logo_path: "assets/img/Logo.ico"
+    logo_path: "assets/img/Logo-1024.png"
 
     context_menu:
         dll_path: assets/OpenWithSpheroscopic_CM.dll
@@ -61,7 +63,19 @@ msix_config:
               commands:
                   - id: YourAppMenuCommand
                     clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .jpeg
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .jpe
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
             - type: .png
+              commands:
+                  - id: YourAppMenuCommand
+                    clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
+            - type: .dng
               commands:
                   - id: YourAppMenuCommand
                     clsid: 4F996161-1319-44B8-BC22-ED05C5081D87
