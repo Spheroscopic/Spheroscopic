@@ -11,10 +11,12 @@ import 'package:spheroscopic/riverpod/brightness.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> initFunc(Brightness brightness) async {
-  await Window.setEffect(
-    effect: WindowEffect.mica,
-    dark: brightness == Brightness.dark ? true : false,
-  );
+  if (!Platform.isLinux) {
+    await Window.setEffect(
+      effect: WindowEffect.mica,
+      dark: brightness == Brightness.dark ? true : false,
+    );
+  }
 }
 
 void main(List<String>? args) async {
