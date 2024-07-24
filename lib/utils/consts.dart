@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const String version = 'v1.2.1';
+
 // files
 const List<String> photoExtensions = [
   'jpg',
