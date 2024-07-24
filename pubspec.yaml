@@ -12,7 +12,6 @@ dependencies:
     flutter:
         sdk: flutter
 
-    panorama_viewer: ^1.0.2
     flutter_riverpod: ^2.4.9
     file_selector: ^1.0.3
     desktop_drop: ^0.4.4
