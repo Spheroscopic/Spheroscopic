@@ -1,0 +1,57 @@
+name: Publish to Microsoft Store
+
+on:
+    workflow_call:
+        secrets:
+            AZURE_AD_TENANT_ID:
+                required: true
+            AZURE_AD_CLIENT_ID:
+                required: true
+            AZURE_AD_CLIENT_SECRET:
+                required: true
+            MS_STORE_SELLER_ID:
+                required: true
+
+jobs:
+    windows-store:
+        name: Publish to Microsoft Store
+        runs-on: windows-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup MS Store Developer CLI
+              uses: microsoft/setup-msstore-cli@v1
+
+            - name: Configure MS Store credentials
+              run: msstore reconfigure --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} --clientId ${{ secrets.AZURE_AD_CLIENT_ID }} --clientSecret ${{ secrets.AZURE_AD_CLIENT_SECRET }} --sellerId ${{ secrets.MS_STORE_SELLER_ID }}
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.22.2"
+
+            - name: Download pub dependencies
+              run: flutter pub get
+
+            - name: Create MSIX package for release
+              run: flutter pub run msix:create
+
+            - name: Upload build to workflow run
+              uses: actions/upload-artifact@v1
+              with:
+                  name: Spheroscopic-Windows
+                  path: ${{ github.workspace }}/build/windows/x64/runner/Release
+
+            - name: Upload build to Github Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  tag_name: ${{ needs.version-update.outputs.version }}
+                  files: "${{ github.workspace }}/build/windows/x64/runner/Release/Spheroscopic.msix"
+
+            #- name: Create MSIX package for Microsoft Store
+            #run: msstore package
+
+            #- name: Publish MSIX to the Microsoft Store
+            #run: msstore publish -v -i ./build/windows/x64/runner/Release
