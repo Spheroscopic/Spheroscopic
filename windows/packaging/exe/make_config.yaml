@@ -1,0 +1,10 @@
+script_template: Inno_installer.iss
+
+app_id: 8B8C52D8-C939-4520-844F-3AD038DA5C0B
+publisher: Artem Bagin
+publisher_name: Artem Bagin
+publisher_url: https://github.com/Spheroscopic/Spheroscopic/
+display_name: Spheroscopic
+create_desktop_icon: true
+locales:
+    - en

@@ -1,13 +1,13 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart' as m;
-import 'package:spheroscopic/modules/snackbar.dart';
-import 'package:spheroscopic/panorama/select_panorama.dart';
-import 'package:spheroscopic/riverpod/photoState.dart';
-import 'package:spheroscopic/utils/consts.dart';
+import 'package:Spheroscopic/modules/snackbar.dart';
+import 'package:Spheroscopic/panorama/select_panorama.dart';
+import 'package:Spheroscopic/riverpod/photoState.dart';
+import 'package:Spheroscopic/utils/consts.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:spheroscopic/riverpod/brightness.dart';
+import 'package:Spheroscopic/riverpod/brightness.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -89,35 +89,24 @@ class SelectContainer extends ConsumerWidget {
           bottom: 0,
           child: Padding(
             padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Text(
-                  version,
-                  style: TextStyle(
-                    color: TColor.secondColorText(isDarkMode),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: Image.asset(
-                    "assets/img/github-logo.png",
-                    width: 24,
-                    height: 24,
-                    color: TColor.secondColorText(isDarkMode),
-                  ),
-                  onPressed: () async {
-                    Uri url = Uri.parse(
-                        'https://github.com/Spheroscopic/Spheroscopic');
+            child: IconButton(
+              icon: Image.asset(
+                "assets/img/github-logo.png",
+                width: 24,
+                height: 24,
+                color: TColor.secondColorText(isDarkMode),
+              ),
+              onPressed: () async {
+                Uri url =
+                    Uri.parse('https://github.com/Spheroscopic/Spheroscopic');
 
-                    if (!await launchUrl(url)) {
-                      openSnackBar(
-                          title: 'Error:',
-                          text: 'Could not open url: $url',
-                          context: context);
-                    }
-                  },
-                ),
-              ],
+                if (!await launchUrl(url)) {
+                  openSnackBar(
+                      title: 'Error:',
+                      text: 'Could not open url: $url',
+                      context: context);
+                }
+              },
             ),
           ),
         ),

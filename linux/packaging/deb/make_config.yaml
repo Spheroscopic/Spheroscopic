@@ -1,0 +1,32 @@
+display_name: Spheroscopic
+package_name: spheroscopic
+maintainer:
+    name: Artem Bagin
+    email: execoq@gmail.com
+
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: assets/img/Logo-512.png
+
+postinstall_scripts:
+    - echo "Installed Spheroscopic successfully"
+postuninstall_scripts:
+    - echo "Sorry to see you go :("
+
+keywords:
+    - Panorama
+    - Application
+
+generic_name: A free and open source 360 panorama viewer
+
+categories:
+    - PanoramaViewer
+    - Utility
+    - Photo
+
+startup_notify: true
+# You can also specify [metainfo](https://freedesktop.org/software/appstream/docs/chap-Quickstart.html) file
+# which contains metadata of the app.
+# metainfo: linux/packaging/myappid.appdata.xml

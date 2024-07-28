@@ -3,10 +3,10 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spheroscopic/class/recentFile.dart';
-import 'package:spheroscopic/panorama/panorama_viewer.dart';
-import 'package:spheroscopic/riverpod/brightness.dart';
-import 'package:spheroscopic/utils/consts.dart';
+import 'package:Spheroscopic/class/recentFile.dart';
+import 'package:Spheroscopic/panorama/panorama_viewer.dart';
+import 'package:Spheroscopic/riverpod/brightness.dart';
+import 'package:Spheroscopic/utils/consts.dart';
 //import 'package:panorama_viewer/panorama_viewer.dart';
 
 class PanoramaView extends ConsumerStatefulWidget {

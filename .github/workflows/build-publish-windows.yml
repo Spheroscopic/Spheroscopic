@@ -1,0 +1,83 @@
+name: Build Windows
+
+on:
+    workflow_call:
+        secrets:
+            AZURE_AD_TENANT_ID:
+                required: true
+            AZURE_AD_CLIENT_ID:
+                required: true
+            AZURE_AD_CLIENT_SECRET:
+                required: true
+            MS_STORE_SELLER_ID:
+                required: true
+        inputs:
+            version:
+                required: true
+                type: string
+
+jobs:
+    build-windows:
+        runs-on: windows-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup MS Store Developer CLI
+              uses: microsoft/setup-msstore-cli@v1
+
+            - name: Configure MS Store credentials
+              run: msstore reconfigure --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} --clientId ${{ secrets.AZURE_AD_CLIENT_ID }} --clientSecret ${{ secrets.AZURE_AD_CLIENT_SECRET }} --sellerId ${{ secrets.MS_STORE_SELLER_ID }}
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.22.2"
+
+            - name: Download pub dependencies
+              run: flutter pub get
+
+            - name: Add Dart SDK to PATH
+              run: echo "$HOME\AppData\Local\Pub\Cache\bin" >> $env:GITHUB_PATH
+
+            - name: Enable dart_distributor
+              run: dart pub global activate flutter_distributor
+
+            - name: Build exe setup
+              run: flutter_distributor package --platform windows --targets exe
+
+            - name: Find exe file
+              id: find_exe
+              run: |
+                  $VERSION = "${{ inputs.version }}"
+                  $exePath = Get-ChildItem -Path dist -Recurse -Filter "Spheroscopic_$VERSION*.exe" | Select-Object -First 1
+                  if ($null -eq $exePath) {
+                    Write-Error "File not found"
+                    exit 1
+                  }
+                  echo "EXE_PATH=$($exePath.FullName)" >> $env:GITHUB_ENV
+              shell: pwsh
+
+            - name: Check if exe file exists
+              run: |
+                  if (Test-Path "$env:EXE_PATH") {
+                    Write-Output "File found: $env:EXE_PATH"
+                  } else {
+                    Write-Error "File not found: $env:EXE_PATH"
+                    exit 1
+                  }
+              shell: pwsh
+
+            - name: Upload exe file
+              uses: actions/upload-artifact@v4
+              with:
+                  name: windows-x86-64-result
+                  path: ${{ env.EXE_PATH }} # it exists, don't worry
+
+
+            #- name: Create MSIX package for Microsoft Store
+            #run: msstore package
+
+            #- name: Publish MSIX to the Microsoft Store
+            #run: msstore publish -v -i ./build/windows/x64/runner/Release

@@ -1,0 +1,72 @@
+name: Release version
+
+on:
+    workflow_dispatch:
+        inputs:
+            changelog:
+                type: string
+                description: What's new ?
+                required: true
+
+jobs:
+    get-version:
+        runs-on: ubuntu-latest
+
+        outputs:
+            version: ${{ steps.get_version.outputs.version }}
+            changelog: ${{ steps.get_version.outputs.changelog }}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Defines variables
+              id: get_version
+              run: |
+                  VERSION=$(sed -n 's/^version: \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' pubspec.yaml)
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+                  CHANGELOG="${{ github.event.inputs.changelog }}"
+                  CHANGELOG="${CHANGELOG//'%'/'%25'}"
+                  CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+                  CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+                  echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+
+    build-macos:
+        uses: ./.github/workflows/build-macos.yml
+        needs: [get-version]
+        with:
+            version: ${{ needs.get-version.outputs.version }}
+
+    build-linux:
+        uses: ./.github/workflows/build-linux.yml
+        needs: [get-version]
+        with:
+            version: ${{ needs.get-version.outputs.version }}
+
+    build-publish-windows:
+        uses: ./.github/workflows/build-publish-windows.yml
+        needs: [get-version]
+        secrets: inherit
+        with:
+            version: ${{ needs.get-version.outputs.version }}
+
+    create-release:
+        needs: [get-version, build-macos, build-linux, build-publish-windows]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Download all artifacts
+              uses: actions/download-artifact@v4
+
+            - name: Display structure of downloaded files
+              run: ls -R
+
+            - name: Create GitHub Release
+              uses: ncipollo/release-action@v1
+              with:
+                  artifacts: "./*-result/*"
+                  tag: "v${{ needs.get-version.outputs.version }}"
+                  body: "## What's new: \n\n${{ needs.get-version.outputs.changelog }}"
+                  draft: false
+                  prerelease: false

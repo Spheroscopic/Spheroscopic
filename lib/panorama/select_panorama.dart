@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:spheroscopic/class/recentFile.dart';
-import 'package:spheroscopic/modules/snackbar.dart';
-import 'package:spheroscopic/panorama/panorama_view.dart';
-import 'package:spheroscopic/riverpod/photoState.dart';
-import 'package:spheroscopic/utils/consts.dart';
+import 'package:Spheroscopic/class/recentFile.dart';
+import 'package:Spheroscopic/modules/snackbar.dart';
+import 'package:Spheroscopic/panorama/panorama_view.dart';
+import 'package:Spheroscopic/riverpod/photoState.dart';
+import 'package:Spheroscopic/utils/consts.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:path/path.dart' as path;
 

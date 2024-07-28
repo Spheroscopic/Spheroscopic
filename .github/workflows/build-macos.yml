@@ -1,0 +1,76 @@
+name: Build MacOS
+
+on:
+    workflow_call:
+        inputs:
+            version:
+                required: true
+                type: string
+
+jobs:
+    build-macos:
+        runs-on: macos-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: latest
+                  architecture: "arm64"
+
+            - name: Install Appdmg
+              run: npm install -g appdmg
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.22.2"
+
+            - name: Delete Podfile.lock
+              run: rm macos/Podfile.lock
+
+            - name: Download pub dependencies
+              run: flutter pub get
+
+            - name: Pod repo update
+              working-directory: macos
+              run: pod install --repo-update
+
+            - name: Update PATH
+              run: export PATH="$PATH":"$HOME/.pub-cache/bin"
+
+            - name: Enable dart_distributor
+              run: dart pub global activate flutter_distributor
+
+            - name: Build dmg package
+              run: flutter_distributor package --platform macos --targets dmg
+
+            - name: Find dmg file
+              id: find_dmg
+              run: |
+                  VERSION=${{ inputs.version }}
+                  DMG_PATH=$(find dist -name "Spheroscopic-$VERSION*-macos.dmg")
+                  echo "dmg_path=$DMG_PATH" >> $GITHUB_OUTPUT
+
+            - name: Check if dmg file exists
+              id: check_file
+              run: |
+                  if [[ ! -f "${{ steps.find_dmg.outputs.dmg_path }}" ]]; then
+                    echo "File not found: ${{ steps.find_dmg.outputs.dmg_path }}"
+                    exit 1
+                  fi
+
+            - name: Rename dmg file
+              id: rename_dmg
+              run: |
+                  NEW_NAME="Spheroscopic-${{ inputs.version }}-macos.dmg"
+                  mv "${{ steps.find_dmg.outputs.dmg_path }}" "dist/$NEW_NAME"
+                  echo "new_dmg_path=dist/$NEW_NAME" >> $GITHUB_OUTPUT
+
+            - name: Upload dmg file
+              uses: actions/upload-artifact@v4
+              with:
+                  name: macos-dmg-result
+                  path: ${{ steps.rename_dmg.outputs.new_dmg_path }}

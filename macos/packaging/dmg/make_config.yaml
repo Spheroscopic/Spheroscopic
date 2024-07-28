@@ -1,0 +1,12 @@
+title: Spheroscopic
+icon: "../../../assets/img/Logo-512.png"
+background: "../../../assets/background.png"
+contents:
+    - x: 410
+      y: 200
+      type: link
+      path: "/Applications"
+    - x: 190
+      y: 200
+      type: file
+      path: Spheroscopic.app

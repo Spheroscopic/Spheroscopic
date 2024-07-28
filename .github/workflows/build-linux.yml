@@ -1,0 +1,96 @@
+name: Build Linux
+
+on:
+    workflow_call:
+        inputs:
+            version:
+                required: true
+                type: string
+
+jobs:
+    build_tar_x86_64:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Install dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libayatana-appindicator3-dev
+
+            - uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.22.2"
+
+            - name: Dependencies
+              run: flutter pub get
+
+            - name: Compile linux
+              run: flutter build linux --release
+
+            - name: Create tar.gz archive
+              run: |
+                  cd build/linux/x64/release/bundle
+                  tar -czvf ../../../../../Spheroscopic_${{ inputs.version }}_linux_x86-64.tar.gz *
+
+            - name: Upload tar.gz archive
+              uses: actions/upload-artifact@v4
+              with:
+                  name: linux-tar-gz-x86-64-result
+                  path: ./*.tar.gz
+
+    build_deb_x86_64:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libayatana-appindicator3-dev
+
+            - uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.22.2"
+
+            - name: Download pub dependencies
+              run: flutter pub get
+
+            - name: Update PATH
+              run: export PATH="$PATH:$HOME/.pub-cache/bin"
+
+            - name: Enable dart_distributor
+              run: dart pub global activate flutter_distributor
+
+            - name: Build deb package
+              run: flutter_distributor package --platform linux --targets deb
+
+            - name: Find deb file
+              id: find_deb
+              run: |
+                  VERSION=${{ inputs.version }}
+                  DEB_PATH=$(find dist -name "Spheroscopic-$VERSION*-linux.deb" -print -quit)
+                  echo "deb_path=$DEB_PATH" >> $GITHUB_OUTPUT
+
+            - name: Check if deb file exists
+              run: |
+                  if [[ ! -f "${{ steps.find_deb.outputs.deb_path }}" ]]; then
+                    echo "File not found: ${{ steps.find_deb.outputs.deb_path }}"
+                    exit 1
+                  fi
+
+            - name: Rename deb file
+              id: rename_deb
+              run: |
+                  NEW_NAME="Spheroscopic_${{ inputs.version }}_linux_x86-64.deb"
+                  mv "${{ steps.find_deb.outputs.deb_path }}" "dist/$NEW_NAME"
+                  echo "new_deb_path=dist/$NEW_NAME" >> $GITHUB_OUTPUT
+
+            - name: Upload deb file
+              uses: actions/upload-artifact@v4
+              with:
+                  name: linux-deb-x86-64-result
+                  path: ${{ steps.rename_deb.outputs.new_deb_path }}

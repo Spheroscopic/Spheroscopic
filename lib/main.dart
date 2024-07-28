@@ -2,12 +2,12 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spheroscopic/home/home_view.dart';
+import 'package:Spheroscopic/home/home_view.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:system_theme/system_theme.dart';
-import 'package:spheroscopic/riverpod/brightness.dart';
+import 'package:Spheroscopic/riverpod/brightness.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> initFunc(Brightness brightness) async {
