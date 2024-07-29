@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.1
+version: 1.2.2
 
 environment:
     sdk: ">=3.2.3 <4.0.0"
@@ -26,6 +26,7 @@ dependencies:
     flutter_animate: ^4.3.0
     window_manager: ^0.3.7
     url_launcher: ^6.3.0
+    package_info_plus: ^8.0.0
 
 dev_dependencies:
     flutter_test:

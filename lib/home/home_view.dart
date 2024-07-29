@@ -89,24 +89,35 @@ class SelectContainer extends ConsumerWidget {
           bottom: 0,
           child: Padding(
             padding: const EdgeInsets.all(10),
-            child: IconButton(
-              icon: Image.asset(
-                "assets/img/github-logo.png",
-                width: 24,
-                height: 24,
-                color: TColor.secondColorText(isDarkMode),
-              ),
-              onPressed: () async {
-                Uri url =
-                    Uri.parse('https://github.com/Spheroscopic/Spheroscopic');
+            child: Row(
+              children: [
+                Text(
+                  appVersion,
+                  style: TextStyle(
+                    color: TColor.secondColorText(isDarkMode),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: Image.asset(
+                    "assets/img/github-logo.png",
+                    width: 24,
+                    height: 24,
+                    color: TColor.secondColorText(isDarkMode),
+                  ),
+                  onPressed: () async {
+                    Uri url = Uri.parse(
+                        'https://github.com/Spheroscopic/Spheroscopic');
 
-                if (!await launchUrl(url)) {
-                  openSnackBar(
-                      title: 'Error:',
-                      text: 'Could not open url: $url',
-                      context: context);
-                }
-              },
+                    if (!await launchUrl(url)) {
+                      openSnackBar(
+                          title: 'Error:',
+                          text: 'Could not open url: $url',
+                          context: context);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         ),

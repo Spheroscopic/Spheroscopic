@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:Spheroscopic/utils/consts.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Spheroscopic/home/home_view.dart';
@@ -9,6 +10,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:Spheroscopic/riverpod/brightness.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 Future<void> initFunc(Brightness brightness) async {
   if (!Platform.isLinux) {
@@ -46,6 +48,10 @@ void main(List<String>? args) async {
 
   Brightness brightness = PlatformDispatcher.instance.platformBrightness;
   await initFunc(brightness);
+
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+  appVersion = packageInfo.version;
 
   await SentryFlutter.init(
     (options) {
