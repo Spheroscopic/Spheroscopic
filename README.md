@@ -1,6 +1,6 @@
 # Spheroscopic 
 
-A free and open source 360 panorama viewer
+A free and open source 360 panorama viewer for Windows/MacOS/Linux
 
 ## Screenshots
 
