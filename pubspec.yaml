@@ -28,14 +28,24 @@ dependencies:
     url_launcher: ^6.3.0
     package_info_plus: ^8.0.0
 
+    msvcredist:
+        git:
+            url: https://github.com/insertjokehere/flutter_msvcredist.git
+            ref: main
+
 dev_dependencies:
     flutter_test:
         sdk: flutter
 
     flutter_lints: ^4.0.0
     flutter_launcher_icons: "^0.13.1"
-    msix: ^3.16.7
+    # msix: ^3.16.7
     build_runner: ^2.4.7
+
+    msix:
+        git:
+            url: https://github.com/insertjokehere/msix.git
+            ref: msvc_redist
 
 flutter_launcher_icons:
     image_path: "assets/img/Logo-1024.png"
@@ -51,7 +61,6 @@ msix_config:
     publisher_display_name: Artem Bagin
     publisher: CN=DDE4AEE6-9493-4839-AD4F-C696473218F4
     identity_name: 63552ArtemBagin.Spheroscopic
-    store: true
 
     languages: en-us
     logo_path: "assets/img/Logo-1024.png"
