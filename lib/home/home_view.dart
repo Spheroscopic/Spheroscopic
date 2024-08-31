@@ -3,44 +3,24 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:Spheroscopic/utils/snackBar.dart';
 import 'package:Spheroscopic/panorama/select_panorama.dart';
-import 'package:Spheroscopic/riverpod/photoState.dart';
 import 'package:Spheroscopic/utils/consts.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:Spheroscopic/riverpod/brightness.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends HookWidget {
   final List<String>? args;
-  const HomeScreen(this.args, {super.key});
+  final bool isDarkMode;
+  const HomeScreen(this.args, this.isDarkMode, {super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreen();
-}
-
-class _HomeScreen extends ConsumerState<HomeScreen> {
-  late List<String> args;
-
-  bool _dragging = false;
-
-  @override
-  void initState() {
-    args = widget.args!;
-
-    super.initState();
-
-    startTime();
-  }
-
-  void startTime() async {
+  void startTime(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool firstTime = prefs.getBool('first_time') ?? false;
 
-    if (!firstTime && mounted) {
-      bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
+    if (!firstTime && context.mounted) {
       await showDialog<String>(
         context: context,
         dismissWithEsc: false,
@@ -133,12 +113,17 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isPhotoLoading = useState(false);
+    final _dragging = useState(false);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print("HomeScreen build finished");
 
-      if (args.isNotEmpty) {
-        PanoramaHandler.openPanorama(args, context, ref);
-        args = [];
+      startTime(context);
+
+      if (args!.isNotEmpty) {
+        PanoramaHandler.openPanorama(args!, isPhotoLoading, context);
+        args?.clear();
       }
     });
 
@@ -149,25 +134,21 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
           for (var str in detail.files) {
             files.add(str.path);
           }
-          PanoramaHandler.openPanorama(files, context, ref);
+          PanoramaHandler.openPanorama(files, isPhotoLoading, context);
         },
         onDragEntered: (detail) {
-          setState(() {
-            _dragging = true;
-          });
+          _dragging.value = true;
         },
         onDragExited: (detail) {
-          setState(() {
-            _dragging = false;
-          });
+          _dragging.value = false;
         },
         child: Mica(
           backgroundColor: Colors.transparent,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
-            child: _dragging
-                ? DragContainer(key: UniqueKey())
-                : SelectContainer(key: UniqueKey()),
+            child: _dragging.value
+                ? const DragContainer()
+                : SelectContainer(isPhotoLoading, isDarkMode),
           ),
         ),
       ),
@@ -175,84 +156,77 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
   }
 }
 
-class SelectContainer extends ConsumerWidget {
-  const SelectContainer({super.key});
+class SelectContainer extends HookWidget {
+  final ValueNotifier<bool> isLoading;
+  final bool isDarkMode;
+  const SelectContainer(this.isLoading, this.isDarkMode, {super.key});
 
   @override
-  Widget build(context, ref) {
-    final addPhotoButtonState = ref.watch(addPhotoState);
-    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
-
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Positioned(
-          right: 0,
-          bottom: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: SizedBox(
-              height: 40,
-              child: Row(
-                children: [
-                  FilledButton(
-                    style: const ButtonStyle(
-                      textStyle: WidgetStatePropertyAll(
-                        TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      padding: WidgetStatePropertyAll(
-                        EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Uri url = Uri.parse('https://ko-fi.com/consequential');
-
-                      if (!await launchUrl(url)) {
-                        openSnackBar('Could not open url', '$url', context);
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          "assets/img/kofi-logo.png",
-                          width: 24,
-                          height: 24,
-                        ),
-                        const SizedBox(width: 6),
-                        const Text('Donate'),
-                      ],
+          right: 10,
+          bottom: 10,
+          child: Row(
+            children: [
+              FilledButton(
+                style: const ButtonStyle(
+                  textStyle: WidgetStatePropertyAll(
+                    TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: Image.asset(
-                      "assets/img/github-logo.png",
+                  padding: WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                  ),
+                ),
+                onPressed: () async {
+                  Uri url = Uri.parse('https://ko-fi.com/consequential');
+
+                  if (!await launchUrl(url)) {
+                    openSnackBar('Could not open url', '$url', context);
+                  }
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/img/kofi-logo.png",
                       width: 24,
                       height: 24,
-                      color: TColor.secondColorText(isDarkMode),
                     ),
-                    onPressed: () async {
-                      Uri url = Uri.parse(
-                          'https://github.com/Spheroscopic/Spheroscopic');
-
-                      if (!await launchUrl(url)) {
-                        openSnackBar('Could not open url', '$url', context);
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    appVersion,
-                    style: TextStyle(
-                      color: TColor.secondColorText(isDarkMode),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                ],
+                    const SizedBox(width: 6),
+                    const Text('Donate'),
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(width: 10),
+              IconButton(
+                icon: Image.asset(
+                  "assets/img/github-logo.png",
+                  width: 24,
+                  height: 24,
+                  color: TColor.secondColorText(isDarkMode),
+                ),
+                onPressed: () async {
+                  Uri url =
+                      Uri.parse('https://github.com/Spheroscopic/Spheroscopic');
+
+                  if (!await launchUrl(url)) {
+                    openSnackBar('Could not open url', '$url', context);
+                  }
+                },
+              ),
+              const SizedBox(width: 10),
+              Text(
+                appVersion,
+                style: TextStyle(
+                  color: TColor.secondColorText(isDarkMode),
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
           ),
         ),
         Center(
@@ -286,12 +260,12 @@ class SelectContainer extends ConsumerWidget {
                     EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                   ),
                 ),
-                onPressed: addPhotoButtonState.isLoading
+                onPressed: isLoading.value
                     ? null
                     : () {
-                        PanoramaHandler.openPanorama([], context, ref);
+                        PanoramaHandler.openPanorama([], isLoading, context);
                       },
-                child: addPhotoButtonState.isLoading
+                child: isLoading.value
                     ? const SizedBox(
                         height: 20.0,
                         width: 20.0,
@@ -309,12 +283,13 @@ class SelectContainer extends ConsumerWidget {
   }
 }
 
-class DragContainer extends ConsumerWidget {
+class DragContainer extends HookWidget {
   const DragContainer({super.key});
 
   @override
-  Widget build(context, ref) {
-    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
+  Widget build(BuildContext context) {
+    final isDarkMode =
+        useState(m.Theme.of(context).brightness == Brightness.dark);
 
     return Padding(
       padding: const EdgeInsets.all(50),
@@ -332,7 +307,7 @@ class DragContainer extends ConsumerWidget {
               Icon(
                 m.Icons.file_download_outlined,
                 size: 100,
-                color: TColor.mainColor(isDarkMode),
+                color: TColor.mainColor(isDarkMode.value),
               ),
               const SizedBox(height: 30),
               Text(
@@ -340,7 +315,7 @@ class DragContainer extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: TColor.mainColorText(isDarkMode),
+                  color: TColor.mainColorText(isDarkMode.value),
                 ),
               ),
             ],

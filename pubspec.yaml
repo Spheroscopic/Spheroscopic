@@ -12,10 +12,8 @@ dependencies:
     flutter:
         sdk: flutter
 
-    flutter_riverpod: ^2.4.9
     flutter_hooks: ^0.20.5
     shared_preferences: ^2.3.2
-
     sentry_flutter: ^8.3.0
     flutter_acrylic: ^1.1.3
     fluent_ui: ^4.9.1
@@ -26,7 +24,6 @@ dependencies:
     package_info_plus: ^8.0.2
     file_selector: ^1.0.3
     desktop_drop: ^0.4.4
-
     dotted_border: ^2.1.0
     dchs_motion_sensors: ^1.0.2
     flutter_cube: ^0.1.1

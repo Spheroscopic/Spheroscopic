@@ -5,7 +5,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:Spheroscopic/class/recentFile.dart';
 import 'package:Spheroscopic/utils/snackBar.dart';
 import 'package:Spheroscopic/panorama/panorama_view.dart';
-import 'package:Spheroscopic/riverpod/photoState.dart';
 import 'package:Spheroscopic/utils/consts.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:path/path.dart' as path;
@@ -85,8 +84,9 @@ class PanoramaHandler {
     openSnackBar(error.toString(), pano, context);
   }
 
-  static Future<void> openPanorama(List<String> panPath, context, ref) async {
-    ref.read(addPhotoState.notifier).loading();
+  static Future<void> openPanorama(
+      List<String> panPath, status, context) async {
+    status.value = true;
 
     if (panPath.isEmpty) {
       panPath = await _selectFiles();
@@ -134,7 +134,7 @@ class PanoramaHandler {
       );
 
       Navigator.push(
-        context!,
+        context,
         FluentPageRoute(
           builder: (context) => PanoramaView(panos),
         ),
@@ -143,6 +143,6 @@ class PanoramaHandler {
 
     await transaction.finish(status: const SpanStatus.ok());
 
-    ref.read(addPhotoState.notifier).completed();
+    status.value = false;
   }
 }
