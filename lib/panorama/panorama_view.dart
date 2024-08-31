@@ -227,6 +227,14 @@ class BottomPanel extends HookWidget {
                         ],
                       ),
                       const SizedBox(width: 10),
+                      /* TODO:
+                      *  Replace current list with a carousel:
+                      *  https://m3.material.io/components/carousel/overview
+                      *  https://www.youtube.com/watch?v=Nnxg-Jhhk6M
+
+                      *  Attach scrollController to ListView.builder:
+                      *  https://stackoverflow.com/questions/52114535/scrollcontroller-not-attached-to-any-scroll-views
+                      */
                       if (panos.length > 1)
                         Flexible(
                           child: Container(
