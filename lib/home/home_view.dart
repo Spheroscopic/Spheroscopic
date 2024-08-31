@@ -7,10 +7,26 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
-class HomeScreen extends HookWidget {
-  final List<String>? args;
+class HomeScreen extends StatefulHookWidget {
+  final List<String> args;
   final bool isDarkMode;
   const HomeScreen(this.args, this.isDarkMode, {super.key});
+
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late List<String> args;
+  late bool isDarkMode;
+
+  @override
+  void initState() {
+    args = widget.args;
+    isDarkMode = widget.isDarkMode;
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +38,9 @@ class HomeScreen extends HookWidget {
 
       firstTimeDialog(isDarkMode, context);
 
-      if (args!.isNotEmpty) {
-        PanoramaHandler.openPanorama(args!, isPhotoLoading, context);
-        args?.clear();
+      if (args.isNotEmpty) {
+        PanoramaHandler.openPanorama(args, isPhotoLoading, context);
+        args = [];
       }
     });
 
