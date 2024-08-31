@@ -57,15 +57,23 @@ void main(List<String>? args) async {
     (options) {
       options.dsn =
           'https://3ee13c2813e0d95f066e7bc4171d7042@o4506094609563648.ingest.sentry.io/4506524905963520';
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-      // We recommend adjusting this value in production.
       options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+      options.attachViewHierarchy = true;
+      options.enableMetrics = true;
+      options.enableTimeToFullDisplayTracing = true;
     },
     appRunner: () => runApp(
       ProviderScope(
         child: MyApp(args),
       ),
     ),
+  );
+  print("dsadas");
+
+  Sentry.metrics().increment(
+    'app.opened', // key
+    value: 1, // value
   );
 }
 
@@ -113,6 +121,9 @@ class _MyAppState extends ConsumerState<MyApp> {
           brightness: brightness,
         ),
         home: HomeScreen(args),
+        navigatorObservers: [
+          SentryNavigatorObserver(),
+        ],
       ),
     );
   }
