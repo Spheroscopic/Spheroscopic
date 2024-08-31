@@ -1,42 +1,45 @@
+import 'package:Spheroscopic/home/home.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart' as m;
-import 'package:Spheroscopic/modules/snackbar.dart';
 import 'package:Spheroscopic/panorama/select_panorama.dart';
-import 'package:Spheroscopic/riverpod/photoState.dart';
 import 'package:Spheroscopic/utils/consts.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:Spheroscopic/riverpod/brightness.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  final List<String>? args;
-  const HomeScreen(this.args, {super.key});
+class HomeScreen extends StatefulHookWidget {
+  final List<String> args;
+  final bool isDarkMode;
+  const HomeScreen(this.args, this.isDarkMode, {super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreen();
+  State<StatefulWidget> createState() => _HomeScreenState();
 }
 
-class _HomeScreen extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   late List<String> args;
-
-  bool _dragging = false;
+  late bool isDarkMode;
 
   @override
   void initState() {
-    args = widget.args!;
+    args = widget.args;
+    isDarkMode = widget.isDarkMode;
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isPhotoLoading = useState(false);
+    final dragging = useState(false);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print("HomeScreen build finished");
 
+      firstTimeDialog(isDarkMode, context);
+
       if (args.isNotEmpty) {
-        PanoramaHandler.openPanorama(args, context, ref);
+        PanoramaHandler.openPanorama(args, isPhotoLoading, context);
         args = [];
       }
     });
@@ -44,29 +47,21 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
     return m.Scaffold(
       body: DropTarget(
         onDragDone: (detail) {
-          List<String> files = [];
-          for (var str in detail.files) {
-            files.add(str.path);
-          }
-          PanoramaHandler.openPanorama(files, context, ref);
+          processDragAndDrop(detail.files, isPhotoLoading, context);
         },
         onDragEntered: (detail) {
-          setState(() {
-            _dragging = true;
-          });
+          dragging.value = true;
         },
         onDragExited: (detail) {
-          setState(() {
-            _dragging = false;
-          });
+          dragging.value = false;
         },
         child: Mica(
           backgroundColor: Colors.transparent,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
-            child: _dragging
-                ? DragContainer(key: UniqueKey())
-                : SelectContainer(key: UniqueKey()),
+            child: dragging.value
+                ? const DragContainer()
+                : SelectContainer(isPhotoLoading, isDarkMode),
           ),
         ),
       ),
@@ -74,51 +69,82 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
   }
 }
 
-class SelectContainer extends ConsumerWidget {
-  const SelectContainer({super.key});
+class SelectContainer extends HookWidget {
+  final ValueNotifier<bool> isLoading;
+  final bool isDarkMode;
+  const SelectContainer(this.isLoading, this.isDarkMode, {super.key});
 
   @override
-  Widget build(context, ref) {
-    final addPhotoButtonState = ref.watch(addPhotoState);
-    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
-
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Positioned(
-          right: 0,
-          bottom: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Text(
-                  appVersion,
-                  style: TextStyle(
-                    color: TColor.secondColorText(isDarkMode),
+          right: 10,
+          bottom: 10,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FilledButton(
+                style: const ButtonStyle(
+                  textStyle: WidgetStatePropertyAll(
+                    TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  padding: WidgetStatePropertyAll(
+                    EdgeInsets.only(bottom: 8, top: 8, left: 10, right: 13),
                   ),
                 ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: Image.asset(
-                    "assets/img/github-logo.png",
-                    width: 24,
-                    height: 24,
-                    color: TColor.secondColorText(isDarkMode),
-                  ),
-                  onPressed: () async {
-                    Uri url = Uri.parse(
-                        'https://github.com/Spheroscopic/Spheroscopic');
-
-                    if (!await launchUrl(url)) {
-                      openSnackBar(
-                          title: 'Error:',
-                          text: 'Could not open url: $url',
-                          context: context);
-                    }
-                  },
+                onPressed: () {
+                  openKoFi(context);
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      "assets/img/kofi-logo.png",
+                      scale: 5,
+                      width: 32,
+                      height: 21.5,
+                    ),
+                    const SizedBox(width: 6),
+                    const Text('Donate'),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 10),
+              IconButton(
+                icon: Image.asset(
+                  "assets/img/github-logo.png",
+                  width: 24,
+                  height: 24,
+                  color: TColor.secondColorText(isDarkMode),
+                ),
+                onPressed: () {
+                  openGitHub(context);
+                },
+              ),
+              const SizedBox(width: 5),
+              IconButton(
+                icon: Icon(
+                  m.Icons.bug_report,
+                  size: 24,
+                  color: TColor.secondColorText(isDarkMode),
+                ),
+                onPressed: () {
+                  sendFeedBack(context);
+                },
+              ),
+              const SizedBox(width: 10),
+              Text(
+                appVersion,
+                style: TextStyle(
+                  color: TColor.secondColorText(isDarkMode),
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
           ),
         ),
         Center(
@@ -130,7 +156,7 @@ class SelectContainer extends ConsumerWidget {
                 size: 100,
                 color: TColor.mainColor(isDarkMode),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Text(
                 "Select or drop panoramas here",
                 style: TextStyle(
@@ -140,24 +166,24 @@ class SelectContainer extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 25),
-              FilledButton(
+              Button(
                 style: const ButtonStyle(
                   textStyle: WidgetStatePropertyAll(
                     TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   padding: WidgetStatePropertyAll(
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                   ),
                 ),
-                onPressed: addPhotoButtonState.isLoading
-                    ? null
-                    : () {
-                        PanoramaHandler.openPanorama([], context, ref);
-                      },
-                child: addPhotoButtonState.isLoading
+                onPressed: () {
+                  if (!isLoading.value) {
+                    PanoramaHandler.openPanorama([], isLoading, context);
+                  }
+                },
+                child: isLoading.value
                     ? const SizedBox(
                         height: 20.0,
                         width: 20.0,
@@ -175,12 +201,13 @@ class SelectContainer extends ConsumerWidget {
   }
 }
 
-class DragContainer extends ConsumerWidget {
+class DragContainer extends HookWidget {
   const DragContainer({super.key});
 
   @override
-  Widget build(context, ref) {
-    bool isDarkMode = ref.watch(brightnessRef) == Brightness.dark;
+  Widget build(BuildContext context) {
+    final isDarkMode =
+        useState(m.Theme.of(context).brightness == Brightness.dark);
 
     return Padding(
       padding: const EdgeInsets.all(50),
@@ -198,7 +225,7 @@ class DragContainer extends ConsumerWidget {
               Icon(
                 m.Icons.file_download_outlined,
                 size: 100,
-                color: TColor.mainColor(isDarkMode),
+                color: TColor.mainColor(isDarkMode.value),
               ),
               const SizedBox(height: 30),
               Text(
@@ -206,7 +233,7 @@ class DragContainer extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: TColor.mainColorText(isDarkMode),
+                  color: TColor.mainColorText(isDarkMode.value),
                 ),
               ),
             ],

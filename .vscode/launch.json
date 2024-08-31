@@ -5,9 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "panorama_viewer",
+            "name": "panorama_viewer (debug mode)",
             "request": "launch",
-            "type": "dart",
+            "type": "dart"
         },
         {
             "name": "panorama_viewer (profile mode)",

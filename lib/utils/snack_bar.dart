@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-void openSnackBar(
-    {required String title, required String text, context}) async {
+void openSnackBar(String title, String text, BuildContext context) async {
   await displayInfoBar(context, builder: (context, close) {
     return InfoBar(
       title: Text(title),
