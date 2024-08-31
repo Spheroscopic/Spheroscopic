@@ -3,7 +3,6 @@
 A free and open source 360 panorama viewer for Windows/MacOS/Linux
 
 ## Screenshots
-https://ko-fi.com/consequential
 
 | Opened several panoramas | Home |
 |---|---|
