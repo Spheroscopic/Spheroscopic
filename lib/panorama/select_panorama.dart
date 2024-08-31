@@ -35,55 +35,6 @@ class PanoramaHandler {
     return files.map((file) => file.path).toList();
   }
 
-  static Future<void> _processFile(String pano, List<RecentFile> panos,
-      ISentrySpan transaction, context) async {
-    String panExt = path.extension(pano).replaceAll(".", "").toLowerCase();
-    bool canOpen = photoExtensions.contains(panExt);
-
-    if (canOpen) {
-      File file = File(pano);
-      //final file = _file.sentryTrace();
-
-      if (file.existsSync()) {
-        RecentFile rf = await _loadImage(file);
-        panos.add(rf);
-        transaction.status = const SpanStatus.ok();
-        transaction.setData("Found", true);
-        transaction.setData("Image Resolution", rf.resolution);
-      } else {
-        openSnackBar("The file wasn't found", pano, context);
-        transaction.status = const SpanStatus.notFound();
-        transaction.setData("Found", false);
-      }
-    } else {
-      openSnackBar(
-          "Spheroscopic only supports: .jpg, .png, .dng, .tiff", pano, context);
-      transaction.status = SpanStatus.fromString('Not supported');
-    }
-  }
-
-  static Future<void> _handleError(
-      error,
-      stackTrace,
-      String pano,
-      int amountOfProcessedPanos,
-      List<String> panPath,
-      ISentrySpan transaction,
-      context) async {
-    final p = {
-      'problem with file': pano,
-      'processed panos': amountOfProcessedPanos,
-      'raw panos': panPath,
-    };
-
-    await Sentry.configureScope((scope) => scope.setContexts('Panoramas', p));
-    await Sentry.captureException(error, stackTrace: stackTrace);
-
-    transaction.status = SpanStatus.fromString('$error');
-
-    openSnackBar(error.toString(), pano, context);
-  }
-
   static Future<void> openPanorama(
       List<String> panPath, status, context) async {
     status.value = true;
@@ -92,56 +43,104 @@ class PanoramaHandler {
       panPath = await _selectFiles();
     }
 
-    List<RecentFile> panos = [];
-    final transaction = Sentry.startTransaction(
+    List<RecentFile> processedPanos = [];
+
+    DateTime startProcessing = DateTime.now();
+    final panoramas_transaction = Sentry.startTransaction(
       'Panoramas',
       'Opened Panoramas',
       bindToScope: true,
-      startTimestamp: DateTime.now(),
+      startTimestamp: startProcessing,
     );
 
     for (String pano in panPath) {
-      final _transaction = transaction.startChild(
+      final file_transaction = panoramas_transaction.startChild(
         'Read file',
         description: pano,
         startTimestamp: DateTime.now(),
       );
 
       try {
-        await _processFile(pano, panos, _transaction, context);
-        _transaction.setData("Processed", true);
+        String panExt = path.extension(pano).replaceAll(".", "").toLowerCase();
+        bool canOpen = photoExtensions.contains(panExt);
+
+        if (canOpen) {
+          File file = File(pano);
+          //final file = _file.sentryTrace();
+
+          if (file.existsSync()) {
+            RecentFile rf = await _loadImage(file);
+            processedPanos.add(rf);
+            panoramas_transaction.status = const SpanStatus.ok();
+            panoramas_transaction.setData("Found", true);
+            panoramas_transaction.setData("Image Resolution", rf.resolution);
+          } else {
+            openSnackBar("The file wasn't found", pano, context);
+            panoramas_transaction.status = const SpanStatus.notFound();
+            panoramas_transaction.setData("Found", false);
+          }
+        } else {
+          openSnackBar("Spheroscopic only supports: .jpg, .png, .dng, .tiff",
+              pano, context);
+          panoramas_transaction.status = SpanStatus.fromString('Not supported');
+        }
+
+        file_transaction.setData("Processed", true);
       } catch (error, stackTrace) {
         String msg = error.toString();
-        _transaction.setData("Processed", false);
-        _transaction.setData("Error", msg);
+        file_transaction.setData("Processed", false);
+        file_transaction.setData("Error", msg);
 
-        // Since the error is just about corrupted image it shouldn't send anything
+        // Since the error is just about corrupted image it shouldn't be sent
         if (msg == "Exception: Invalid image data") {
           openSnackBar('Invalid image data', pano, context);
         } else {
-          await _handleError(error, stackTrace, pano, panos.length, panPath,
-              _transaction, context);
+          final p = {
+            'problem with file': pano,
+            'processed panos': processedPanos.length,
+            'raw panos': panPath,
+          };
+
+          await Sentry.configureScope(
+              (scope) => scope.setContexts('Panoramas', p));
+          await Sentry.captureException(error, stackTrace: stackTrace);
+
+          panoramas_transaction.status = SpanStatus.fromString('$error');
+
+          openSnackBar(error.toString(), pano, context);
         }
       } finally {
-        _transaction.finish();
+        file_transaction.finish();
       }
     }
 
-    if (panos.isNotEmpty) {
+    if (processedPanos.isNotEmpty) {
+      DateTime endProcessing = DateTime.now();
+      Duration duration = endProcessing.difference(startProcessing);
+
+      Sentry.metrics().distribution(
+        'loading.panoramas.duration', // key
+        value: duration.inMilliseconds.toDouble(), // value
+        unit: DurationSentryMeasurementUnit.milliSecond,
+      );
+
       Sentry.metrics().gauge(
         'loaded.panoramas', // key
-        value: panos.length.toDouble(), // value
+        value: processedPanos.length.toDouble(), // value
       );
 
       Navigator.push(
         context,
         FluentPageRoute(
-          builder: (context) => PanoramaView(panos),
+          builder: (context) => PanoramaView(processedPanos),
         ),
       );
-    }
 
-    await transaction.finish(status: const SpanStatus.ok());
+      await panoramas_transaction.finish(status: const SpanStatus.ok());
+    } else {
+      panoramas_transaction.status =
+          SpanStatus.fromString('No panoramas found');
+    }
 
     status.value = false;
   }
