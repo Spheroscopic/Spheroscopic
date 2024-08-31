@@ -3,6 +3,7 @@
 A free and open source 360 panorama viewer for Windows/MacOS/Linux
 
 ## Screenshots
+https://ko-fi.com/consequential
 
 | Opened several panoramas | Home |
 |---|---|
@@ -26,7 +27,7 @@ After opening Spheroscopic you can view 360 panorama by:
 
 The latest installers will always be available in the [releases page](https://github.com/Spheroscopic/Spheroscopic/releases).
 
-If you are on Windows you can buy this app in the [Windows Store](https://apps.microsoft.com/detail/9nlx10fx8ckq?rtc=1&hl=kk-kz&gl=KZ).
+If you are on Windows you also can download this app in the [Windows Store](https://apps.microsoft.com/store/detail/9NLX10FX8CKQ).
 
 ## FAQ
 
