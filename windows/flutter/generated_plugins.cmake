@@ -6,7 +6,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_drop
   file_selector_windows
   flutter_acrylic
-  msvcredist
   screen_retriever
   sentry_flutter
   system_theme
