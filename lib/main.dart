@@ -66,7 +66,6 @@ void main(List<String>? args) async {
       MyApp(args!),
     ),
   );
-  print("dsadas");
 
   Sentry.metrics().increment(
     'app.opened', // key

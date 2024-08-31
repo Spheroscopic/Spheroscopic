@@ -2,10 +2,53 @@ import 'package:flutter/material.dart' as m;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:Spheroscopic/class/recentFile.dart';
+import 'package:Spheroscopic/class/panorama_file.dart';
 import 'package:Spheroscopic/panorama/panorama_viewer.dart';
 import 'package:Spheroscopic/utils/consts.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+
+class IconContainer extends StatelessWidget {
+  final Icon icon;
+  final VoidCallback func;
+  final bool isDarkMode;
+
+  const IconContainer({
+    super.key,
+    required this.icon,
+    required this.func,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            offset: const Offset(0, 4),
+            blurRadius: 4,
+            spreadRadius: 0,
+          ),
+        ],
+        color: TColor.secondColor(isDarkMode),
+        border: Border.all(
+          color: TColor.secondColor_selected(isDarkMode),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: IconButton(
+          icon: icon,
+          onPressed: func,
+        ),
+      ),
+    );
+  }
+}
 
 class PanoramaView extends HookWidget {
   final List<RecentFile> panos;
@@ -45,38 +88,6 @@ class BottomPanel extends HookWidget {
 
   final _controller = useScrollController();
   final _focusNode = useFocusNode();
-
-  Widget iconContainer(
-      {required Icon icon,
-      required VoidCallback func,
-      required bool isDarkMode}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            offset: const Offset(0, 4),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-        color: TColor.secondColor(isDarkMode),
-        border: Border.all(
-          color: TColor.secondColor_selected(isDarkMode),
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: IconButton(
-          icon: icon,
-          onPressed: func,
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +201,7 @@ class BottomPanel extends HookWidget {
                         mainAxisAlignment: m.MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: m.CrossAxisAlignment.end,
                         children: [
-                          iconContainer(
+                          IconContainer(
                             icon: Icon(
                               isPinned.value
                                   ? FluentIcons.pinned_solid
@@ -202,7 +213,7 @@ class BottomPanel extends HookWidget {
                             },
                             isDarkMode: isDarkMode.value,
                           ),
-                          iconContainer(
+                          IconContainer(
                             icon: const Icon(
                               FluentIcons.back,
                               size: 16.0,
