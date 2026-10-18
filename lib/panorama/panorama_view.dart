@@ -63,7 +63,6 @@ class PanoramaView extends HookWidget {
         children: [
           Center(
             child: PanoramaViewer(
-              key: UniqueKey(),
               maxZoom: 15.0,
               child: Image(image: panos[selectedIndex.value].file),
             ),
@@ -79,18 +78,16 @@ class BottomPanel extends HookWidget {
   final List<RecentFile> panos;
   final ValueNotifier<int> selectedIndex;
 
-  BottomPanel(this.panos, this.selectedIndex, {super.key});
-
-  final AnimationController animatedController = useAnimationController(
-    initialValue: 1.0,
-    duration: const Duration(seconds: 0),
-  );
-
-  final _controller = useScrollController();
-  final _focusNode = useFocusNode();
+  const BottomPanel(this.panos, this.selectedIndex, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    final animatedController = useAnimationController(
+      initialValue: 1.0,
+      duration: const Duration(seconds: 0),
+    );
+    final scrollController = useScrollController();
+    final focusNode = useFocusNode();
     final isPinned = useState(panos.length == 1);
 
     final hovered = useState(UniqueKey() as Key);
@@ -101,6 +98,7 @@ class BottomPanel extends HookWidget {
 
     // the bottomPanel smoothly dissapears after init, just to make it look cool
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
       if (panos.length > 1 && !isPinned.value && !wasBuilt.value) {
         animatedController.reverse();
         wasBuilt.value = true;
@@ -112,25 +110,26 @@ class BottomPanel extends HookWidget {
 
     return KeyboardListener(
       autofocus: true,
-      focusNode: _focusNode,
+      focusNode: focusNode,
       onKeyEvent: (value) {
-        if (_controller.position.outOfRange) {
+        if (value is KeyUpEvent || !scrollController.hasClients) {
           return;
         }
-        if (value is KeyUpEvent) {
+        final position = scrollController.position;
+        if (!position.hasContentDimensions || position.outOfRange) {
           return;
         }
 
-        final offset = _controller.offset;
-        final minExtent = _controller.position.minScrollExtent;
-        final maxExtent = _controller.position.maxScrollExtent;
+        final offset = scrollController.offset;
+        final minExtent = scrollController.position.minScrollExtent;
+        final maxExtent = scrollController.position.maxScrollExtent;
 
         if (value.physicalKey == PhysicalKeyboardKey.arrowLeft) {
           if (offset > minExtent) {
             double oLeft = offset - minExtent;
             double dec = oLeft > 50 ? 50 : oLeft;
 
-            _controller.animateTo(offset - dec,
+            scrollController.animateTo(offset - dec,
                 duration: const Duration(milliseconds: 100),
                 curve: Curves.linear);
           }
@@ -145,7 +144,7 @@ class BottomPanel extends HookWidget {
             double oLeft = maxExtent - offset;
             double add = oLeft > 50 ? 50 : oLeft;
 
-            _controller.animateTo(offset + add,
+            scrollController.animateTo(offset + add,
                 duration: const Duration(milliseconds: 100),
                 curve: Curves.linear);
           }
@@ -158,7 +157,7 @@ class BottomPanel extends HookWidget {
       child: Align(
         alignment: Alignment.bottomCenter,
         child: SizedBox(
-          height: 110,
+          height: 112,
           child: MouseRegion(
             onHover: (e) {
               isAbsorbing.value = false;
@@ -260,7 +259,7 @@ class BottomPanel extends HookWidget {
                             child: ListView.builder(
                               clipBehavior: Clip.antiAlias,
                               scrollDirection: Axis.horizontal,
-                              controller: _controller,
+                              controller: scrollController,
                               itemCount: panos.length,
                               itemBuilder: (context, index) {
                                 RecentFile panorama = panos[index];

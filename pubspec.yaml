@@ -30,6 +30,7 @@ dependencies:
     flutter_animate: ^4.3.0
 
 dev_dependencies:
+    file_selector_platform_interface: ^2.6.2
     flutter_test:
         sdk: flutter
 

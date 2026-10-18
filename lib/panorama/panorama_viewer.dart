@@ -160,11 +160,13 @@ class PanoramaState extends State<PanoramaViewer>
   late StreamController<Null> _streamController;
   Stream<Null>? _stream;
   ImageStream? _imageStream;
+  late final ImageStreamListener _textureListener =
+      ImageStreamListener(_updateTexture);
 
   double _lastTrackpadScale = 1.0;
 
   void _updateView() {
-    if (scene == null) return;
+    if (!mounted || scene == null) return;
     // auto rotate
     longitudeDelta += 0.001 * widget.animSpeed;
 
@@ -279,6 +281,10 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _updateTexture(ImageInfo imageInfo, bool synchronousCall) {
+    if (!mounted) {
+      imageInfo.dispose();
+      return;
+    }
     if (surface?.mesh != null) {
       surface?.mesh.texture = imageInfo.image;
       surface?.mesh.textureRect = Rect.fromLTWH(0, 0,
@@ -290,14 +296,15 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _loadTexture(ImageProvider? provider) {
-    if (provider == null) return;
-    _imageStream?.removeListener(ImageStreamListener(_updateTexture));
+    _imageStream?.removeListener(_textureListener);
+    _imageStream = null;
+    if (!mounted || provider == null) return;
     _imageStream = provider.resolve(const ImageConfiguration());
-    ImageStreamListener listener = ImageStreamListener(_updateTexture);
-    _imageStream!.addListener(listener);
+    _imageStream!.addListener(_textureListener);
   }
 
   void _onSceneCreated(Scene scene) async {
+    if (!mounted) return;
     this.scene = scene;
     scene.camera.near = 1.0;
     scene.camera.far = _radius + 1.0;
@@ -305,7 +312,11 @@ class PanoramaState extends State<PanoramaViewer>
     scene.camera.zoom = widget.zoom;
     scene.camera.position.setFrom(Vector3(0, 0, 0.1));
     if (widget.child != null) {
-      ui.Image? nn = await createTransparentImage();
+      final nn = await createTransparentImage();
+      if (!mounted || this.scene != scene) {
+        nn.dispose();
+        return;
+      }
 
       final Mesh mesh = generateSphereMesh(
         radius: _radius,
@@ -422,11 +433,13 @@ class PanoramaState extends State<PanoramaViewer>
 
   @override
   void dispose() {
-    _imageStream?.removeListener(ImageStreamListener(_updateTexture));
+    _imageStream?.removeListener(_textureListener);
     _orientationSubscription?.cancel();
     _screenOrientSubscription?.cancel();
     _controller.dispose();
     _streamController.close();
+    scene = null;
+    surface = null;
     super.dispose();
   }
 
@@ -505,16 +518,19 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _handleTapUp(PointerUpEvent details) {
+    if (!mounted || scene == null) return;
     final Vector3 o =
         positionToLatLon(details.localPosition.dx, details.localPosition.dy);
     widget.onTap!(degrees(o.x), degrees(-o.y), degrees(o.z));
   }
 
   void _handleMoveStart(PointerDownEvent details) {
+    if (!mounted) return;
     _lastFocalPoint = details.localPosition;
   }
 
   void _handleMoveUpdate(PointerMoveEvent details) {
+    if (!mounted || scene == null || scene!.camera.viewportHeight <= 0) return;
     final offset = details.localPosition - _lastFocalPoint;
     _lastFocalPoint = details.localPosition;
     latitudeDelta += widget.sensitivity /
@@ -544,6 +560,7 @@ class PanoramaState extends State<PanoramaViewer>
   }
 
   void _handleScaleUpdate(double zoomScale) {
+    if (!mounted || scene == null) return;
     //print("Zoom scale: $zoomScale");
     double zoomSpeed = zoomScale * 0.2; // Adjust the speed if necessary
     _targetZoom =
