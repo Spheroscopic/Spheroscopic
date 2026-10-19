@@ -9,7 +9,8 @@ on:
 
 jobs:
     build-windows:
-        runs-on: windows-latest
+        # Flutter 3.24 supports the Visual Studio 2022 generator.
+        runs-on: windows-2022
 
         steps:
             - name: Checkout
