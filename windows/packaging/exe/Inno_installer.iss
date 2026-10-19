@@ -34,7 +34,7 @@ Source: "{{SOURCE_DIR}}\file_selector_windows_plugin.dll"; DestDir: "{app}"; Fla
 Source: "{{SOURCE_DIR}}\flutter_acrylic_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{{SOURCE_DIR}}\flutter_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{{SOURCE_DIR}}\screen_retriever_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{{SOURCE_DIR}}\sentry_flutter_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{{SOURCE_DIR}}\sentry.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{{SOURCE_DIR}}\system_theme_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{{SOURCE_DIR}}\url_launcher_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\assets\win_dlls\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
