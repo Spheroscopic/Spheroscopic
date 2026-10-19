@@ -127,15 +127,15 @@ class PanoramaHandler {
           DateTime endProcessing = DateTime.now();
           Duration duration = endProcessing.difference(startProcessing);
 
-          Sentry.metrics().distribution(
-            'loading.panoramas.duration', // key
-            value: duration.inMilliseconds.toDouble(), // value
+          panoramasTransaction.setMeasurement(
+            'loading.panoramas.duration',
+            duration.inMilliseconds.toDouble(),
             unit: DurationSentryMeasurementUnit.milliSecond,
           );
 
-          Sentry.metrics().gauge(
-            'loaded.panoramas', // key
-            value: processedPanos.length.toDouble(), // value
+          panoramasTransaction.setMeasurement(
+            'loaded.panoramas',
+            processedPanos.length,
           );
 
           Navigator.push(

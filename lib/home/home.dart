@@ -116,14 +116,14 @@ void sendFeedBack(BuildContext context) async {
                 return;
               }
 
-              final userFeedback = SentryUserFeedback(
-                eventId: sentryId,
+              final userFeedback = SentryFeedback(
+                associatedEventId: sentryId,
                 name: name.text,
-                email: email.text,
-                comments: feedback.text,
+                contactEmail: email.text,
+                message: feedback.text,
               );
 
-              await Sentry.captureUserFeedback(userFeedback);
+              await Sentry.captureFeedback(userFeedback);
 
               if (context.mounted) {
                 Navigator.of(context, rootNavigator: true).pop();
@@ -217,10 +217,10 @@ void firstTimeDialog(bool isDarkMode, BuildContext context) async {
             child: const Text('Agree'),
             onPressed: () async {
               await prefs.setBool('first_time', true);
-              Sentry.metrics().increment(
-                'first.time', // key
-                value: 1, // value
-              );
+              await Sentry.addBreadcrumb(Breadcrumb(
+                category: 'app.lifecycle',
+                message: 'first.time',
+              ));
 
               if (context.mounted) {
                 Navigator.of(context, rootNavigator: true).pop();

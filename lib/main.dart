@@ -59,7 +59,6 @@ void main(List<String>? args) async {
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
       options.attachViewHierarchy = true;
-      options.enableMetrics = true;
       options.enableTimeToFullDisplayTracing = true;
     },
     appRunner: () => runApp(
@@ -67,10 +66,10 @@ void main(List<String>? args) async {
     ),
   );
 
-  Sentry.metrics().increment(
-    'app.opened', // key
-    value: 1, // value
-  );
+  await Sentry.addBreadcrumb(Breadcrumb(
+    category: 'app.lifecycle',
+    message: 'app.opened',
+  ));
 }
 
 class MyApp extends HookWidget {

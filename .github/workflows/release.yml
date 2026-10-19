@@ -45,7 +45,6 @@ jobs:
     build-publish-windows:
         uses: ./.github/workflows/build-publish-windows.yml
         needs: [get-version]
-        secrets: inherit
         with:
             version: ${{ needs.get-version.outputs.version }}
 

@@ -2,15 +2,6 @@ name: Build Windows
 
 on:
     workflow_call:
-        secrets:
-            AZURE_AD_TENANT_ID:
-                required: true
-            AZURE_AD_CLIENT_ID:
-                required: true
-            AZURE_AD_CLIENT_SECRET:
-                required: true
-            MS_STORE_SELLER_ID:
-                required: true
         inputs:
             version:
                 required: true
@@ -23,12 +14,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-
-            - name: Setup MS Store Developer CLI
-              uses: microsoft/setup-msstore-cli@v1
-
-            - name: Configure MS Store credentials
-              run: msstore reconfigure --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} --clientId ${{ secrets.AZURE_AD_CLIENT_ID }} --clientSecret ${{ secrets.AZURE_AD_CLIENT_SECRET }} --sellerId ${{ secrets.MS_STORE_SELLER_ID }}
 
             - name: Setup Flutter
               uses: subosito/flutter-action@v2
@@ -76,8 +61,4 @@ jobs:
                   path: ${{ env.EXE_PATH }} # it exists, don't worry
 
 
-            #- name: Create MSIX package for Microsoft Store
-            #run: msstore package
-
-            #- name: Publish MSIX to the Microsoft Store
-            #run: msstore publish -v -i ./build/windows/x64/runner/Release
+            # Microsoft Store submission is a separate process from this GitHub installer build.
